@@ -1,0 +1,11 @@
+ble_ibeacon/build
+ble_ibeacon/.vscode
+
+gatt_server/build
+gatt_server/.vscode
+
+gatt_server_service_table/build
+gatt_server_service_table/.vscode
+
+
+
