@@ -1057,3 +1057,5 @@
 258429	258817	6890699893407428	D:/MyProject/ESP32-DEMO/hello_world/build/.bin_timestamp	a293ad5cdbe85074
 258819	259012	0	esp-idf/esptool_py/CMakeFiles/app_check_size	ba7edcd9f172de88
 258819	259012	0	D:/MyProject/ESP32-DEMO/hello_world/build/esp-idf/esptool_py/CMakeFiles/app_check_size	ba7edcd9f172de88
+1	27891189	0	CMakeFiles/confserver	9827a5d35ec53b86
+1	27891189	0	D:/MyProject/ESP32-DEMO/hello_world/build/CMakeFiles/confserver	9827a5d35ec53b86
