@@ -19,4 +19,7 @@ ble_spp_client/.vscode
 ble_spp_server/build
 ble_spp_server/.vscode
 
+matrix_keyboard/build
+matrix_keyboard/.vscode
+
 
