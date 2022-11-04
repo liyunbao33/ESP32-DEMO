@@ -7,5 +7,7 @@ gatt_server/.vscode
 gatt_server_service_table/build
 gatt_server_service_table/.vscode
 
+bt_spp_acceptor/build
+bt_spp_acceptor/.vscode
 
 
