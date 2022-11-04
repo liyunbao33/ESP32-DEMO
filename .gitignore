@@ -13,4 +13,10 @@ bt_spp_acceptor/.vscode
 blink/build
 blink/.vscode
 
+ble_spp_client/build
+ble_spp_client/.vscode
+
+ble_spp_server/build
+ble_spp_server/.vscode
+
 
