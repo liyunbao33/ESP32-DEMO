@@ -22,4 +22,7 @@ ble_spp_server/.vscode
 matrix_keyboard/build
 matrix_keyboard/.vscode
 
+lvgl/build
+lvgl/.vscode
+
 
