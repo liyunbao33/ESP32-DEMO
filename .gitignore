@@ -10,4 +10,7 @@ gatt_server_service_table/.vscode
 bt_spp_acceptor/build
 bt_spp_acceptor/.vscode
 
+blink/build
+blink/.vscode
+
 
