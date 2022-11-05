@@ -263,9 +263,9 @@ void app_main(void)
      * Set default parameters for Legacy Pairing
      * Use variable pin, input pin code when pairing
      */
-    // esp_bt_pin_type_t pin_type = ESP_BT_PIN_TYPE_VARIABLE;
-    // esp_bt_pin_code_t pin_code;
-    // esp_bt_gap_set_pin(pin_type, 0, pin_code);
+    esp_bt_pin_type_t pin_type = ESP_BT_PIN_TYPE_VARIABLE;
+    esp_bt_pin_code_t pin_code;
+    esp_bt_gap_set_pin(pin_type, 0, pin_code);
 
     ESP_LOGI(SPP_TAG, "Own address:[%s]", bda2str((uint8_t *)esp_bt_dev_get_address(), bda_str, sizeof(bda_str)));
 
