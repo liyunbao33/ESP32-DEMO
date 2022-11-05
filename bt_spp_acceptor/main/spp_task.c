@@ -23,102 +23,115 @@
 #include "esp_log.h"
 #include "spp_task.h"
 
-// static void spp_task_task_handler(void *arg);
-// static bool spp_task_send_msg(spp_task_msg_t *msg);
-// static void spp_task_work_dispatched(spp_task_msg_t *msg);
+static void spp_task_task_handler(void *arg);
+static bool spp_task_send_msg(spp_task_msg_t *msg);
+static void spp_task_work_dispatched(spp_task_msg_t *msg);
 
-// static xQueueHandle spp_task_task_queue = NULL;
-// static xTaskHandle spp_task_task_handle = NULL;
+static xQueueHandle spp_task_task_queue = NULL;
+static xTaskHandle spp_task_task_handle = NULL;
 
-// bool spp_task_work_dispatch(spp_task_cb_t p_cback, uint16_t event, void *p_params, int param_len, spp_task_copy_cb_t p_copy_cback)
-// {
-//     ESP_LOGD(SPP_TASK_TAG, "%s event 0x%x, param len %d", __func__, event, param_len);
+bool spp_task_work_dispatch(spp_task_cb_t p_cback, uint16_t event, esp_spp_cb_param_t *p_params, int param_len, spp_task_copy_cb_t p_copy_cback)
+{
+    ESP_LOGD(SPP_TASK_TAG, "%s event 0x%x, param len %d", __func__, event, param_len);
 
-//     spp_task_msg_t msg;
-//     memset(&msg, 0, sizeof(spp_task_msg_t));
+    spp_task_msg_t msg;
+    memset(&msg, 0, sizeof(spp_task_msg_t));
 
-//     msg.sig = SPP_TASK_SIG_WORK_DISPATCH;
-//     msg.event = event;
-//     msg.cb = p_cback;
+    msg.sig = SPP_TASK_SIG_WORK_DISPATCH;
+    msg.event = event;
+    msg.cb = p_cback;
 
-//     if (param_len == 0) {
-//         return spp_task_send_msg(&msg);
-//     } else if (p_params && param_len > 0) {
-//         if ((msg.param = malloc(param_len)) != NULL) {
-//             memcpy(msg.param, p_params, param_len);
-//             /* check if caller has provided a copy callback to do the deep copy */
-//             if (p_copy_cback) {
-//                 p_copy_cback(&msg, msg.param, p_params);
-//             }
-//             return spp_task_send_msg(&msg);
-//         }
-//     }
+    if (param_len == 0) {
+        return spp_task_send_msg(&msg);
+    } else if (p_params && param_len > 0) {
+        if ((msg.param = malloc(p_params->data_ind.len)) != NULL) {
+            memcpy(msg.param, p_params->data_ind.data, p_params->data_ind.len);
+            /* check if caller has provided a copy callback to do the deep copy */
+            if (p_copy_cback) {
+                p_copy_cback(&msg, msg.param, p_params);
+            }
+            return spp_task_send_msg(&msg);
+        }
+    }
 
-//     return false;
-// }
+    return false;
+}
 
-// static bool spp_task_send_msg(spp_task_msg_t *msg)
-// {
-//     if (msg == NULL) {
-//         return false;
-//     }
+void spp_task_wr_cb(uint16_t event, void *param)
+{
+    switch (event) {
+    case ESP_SPP_DATA_IND_EVT:    
+    // ESP_LOGI(SPP_TASK_TAG, "ESP_SPP_DATA_IND_EVT len:%d handle:%d",
+    //             param->data_ind.len, param->data_ind.handle);
+    // if (param->data_ind.len < 128) {
+        esp_log_buffer_hex("", param, 1);
+    // }
+        break;
+    }
+}
 
-//     if (xQueueSend(spp_task_task_queue, msg, 10 / portTICK_RATE_MS) != pdTRUE) {
-//         ESP_LOGE(SPP_TASK_TAG, "%s xQueue send failed", __func__);
-//         return false;
-//     }
-//     return true;
-// }
+static bool spp_task_send_msg(spp_task_msg_t *msg)
+{
+    if (msg == NULL) {
+        return false;
+    }
 
-// static void spp_task_work_dispatched(spp_task_msg_t *msg)
-// {
-//     if (msg->cb) {
-//         msg->cb(msg->event, msg->param);
-//     }
-// }
+    if (xQueueSend(spp_task_task_queue, msg, 10 / portTICK_RATE_MS) != pdTRUE) {
+        ESP_LOGE(SPP_TASK_TAG, "%s xQueue send failed", __func__);
+        return false;
+    }
+    return true;
+}
 
-// static void spp_task_task_handler(void *arg)
-// {
-//     spp_task_msg_t msg;
-//     for (;;) {
-//         if (pdTRUE == xQueueReceive(spp_task_task_queue, &msg, (portTickType)portMAX_DELAY)) {
-//             ESP_LOGD(SPP_TASK_TAG, "%s, sig 0x%x, 0x%x", __func__, msg.sig, msg.event);
-//             switch (msg.sig) {
-//             case SPP_TASK_SIG_WORK_DISPATCH:
-//                 spp_task_work_dispatched(&msg);
-//                 break;
-//             default:
-//                 ESP_LOGW(SPP_TASK_TAG, "%s, unhandled sig: %d", __func__, msg.sig);
-//                 break;
-//             }
+static void spp_task_work_dispatched(spp_task_msg_t *msg)
+{
+    if (msg->cb) {
+        msg->cb(msg->event, msg->param);
+    }
+}
 
-//             if (msg.param) {
-//                 free(msg.param);
-//             }
-//         }
-//     }
-// }
+static void spp_task_task_handler(void *arg)
+{
+    spp_task_msg_t msg;
+    for (;;) {
+        if (pdTRUE == xQueueReceive(spp_task_task_queue, &msg, (portTickType)portMAX_DELAY)) {
+            ESP_LOGD(SPP_TASK_TAG, "%s, sig 0x%x, 0x%x", __func__, msg.sig, msg.event);
+            switch (msg.sig) {
+            case SPP_TASK_SIG_WORK_DISPATCH:
+                spp_task_work_dispatched(&msg);
+                break;
+            default:
+                ESP_LOGW(SPP_TASK_TAG, "%s, unhandled sig: %d", __func__, msg.sig);
+                break;
+            }
 
-// void spp_task_task_start_up(void)
-// {
-//     spp_task_task_queue = xQueueCreate(10, sizeof(spp_task_msg_t));
-//     xTaskCreate(spp_task_task_handler, "SPPAppT", 2048, NULL, 10, &spp_task_task_handle);
-//     return;
-// }
+            if (msg.param) {
+                free(msg.param);
+            }
+        }
+    }
+}
 
-// void spp_task_task_shut_down(void)
-// {
-//     if (spp_task_task_handle) {
-//         vTaskDelete(spp_task_task_handle);
-//         spp_task_task_handle = NULL;
-//     }
-//     if (spp_task_task_queue) {
-//         vQueueDelete(spp_task_task_queue);
-//         spp_task_task_queue = NULL;
-//     }
-// }
+void spp_task_task_start_up(void)
+{
+    spp_task_task_queue = xQueueCreate(10, sizeof(spp_task_msg_t));
+    xTaskCreate(spp_task_task_handler, "SPPAppT", 2048, NULL, 10, &spp_task_task_handle);
+    return;
+}
 
-// void spp_wr_task_start_up(spp_wr_task_cb_t p_cback, int fd)
+void spp_task_task_shut_down(void)
+{
+    if (spp_task_task_handle) {
+        vTaskDelete(spp_task_task_handle);
+        spp_task_task_handle = NULL;
+    }
+    if (spp_task_task_queue) {
+        vQueueDelete(spp_task_task_queue);
+        spp_task_task_queue = NULL;
+    }
+}
+
+// void spp_wr_task_start_up(spp_wr_task_cb_t p_cback, int fd)·
 // {
 //     xTaskCreate(p_cback, "write_read", 2048, (void *)fd, 5, NULL);
 // }

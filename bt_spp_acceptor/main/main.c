@@ -20,6 +20,7 @@
 #include "esp_gap_bt_api.h"
 #include "esp_bt_device.h"
 #include "esp_spp_api.h"
+#include "spp_task.h"
 
 #include "time.h"
 #include "sys/time.h"
@@ -110,11 +111,12 @@ static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
          * rather than in this callback directly. Since the printing takes too much time, it may stuck the Bluetooth
          * stack and also have a effect on the throughput!
          */
-        ESP_LOGI(SPP_TAG, "ESP_SPP_DATA_IND_EVT len:%d handle:%d",
-                 param->data_ind.len, param->data_ind.handle);
-        if (param->data_ind.len < 128) {
-            esp_log_buffer_hex("", param->data_ind.data, param->data_ind.len);
-        }
+        // ESP_LOGI(SPP_TAG, "ESP_SPP_DATA_IND_EVT len:%d handle:%d",
+        //          param->data_ind.len, param->data_ind.handle);
+        // if (param->data_ind.len < 128) {
+        //     esp_log_buffer_hex("", param->data_ind.data, param->data_ind.len);
+        // }
+        spp_task_work_dispatch(spp_task_wr_cb, event, param, sizeof(esp_spp_cb_param_t), NULL);
 #else
         gettimeofday(&time_new, NULL);
         data_num += param->data_ind.len;
@@ -269,14 +271,16 @@ void app_main(void)
 
     ESP_LOGI(SPP_TAG, "Own address:[%s]", bda2str((uint8_t *)esp_bt_dev_get_address(), bda_str, sizeof(bda_str)));
 
-    uint8_t data[] = {"{A1:2:3:4}$"};
-    while(1)
-    {
-        vTaskDelay(30/portTICK_PERIOD_MS);
-        if(bt_handle != 0)
-        {
-            esp_spp_write(bt_handle, strlen((char *)data), data);
-        }
-    }
+    spp_task_task_start_up();
+
+    // uint8_t data[] = {"{A1:2:3:4}$"};
+    // while(1)
+    // {
+    //     vTaskDelay(30/portTICK_PERIOD_MS);
+    //     if(bt_handle != 0)
+    //     {
+    //         esp_spp_write(bt_handle, strlen((char *)data), data);
+    //     }
+    // }
 }
  
