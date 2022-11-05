@@ -25,4 +25,7 @@ matrix_keyboard/.vscode
 lvgl/build
 lvgl/.vscode
 
+bt_spp_vfs_acceptor/build
+bt_spp_vfs_acceptor/.vscode
+
 

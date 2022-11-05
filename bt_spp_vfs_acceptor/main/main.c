@@ -6,6 +6,14 @@
    CONDITIONS OF ANY KIND, either express or implied.
 */
 
+/****************************************************************************
+*
+* This file is for bt_spp_vfs_acceptor demo. It can create servers, wait for connected and receive data.
+* run bt_spp_vfs_acceptor demo, the bt_spp_vfs_initiator demo will automatically connect the bt_spp_vfs_acceptor demo,
+* then receive data.
+*
+****************************************************************************/
+
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
@@ -20,26 +28,24 @@
 #include "esp_gap_bt_api.h"
 #include "esp_bt_device.h"
 #include "esp_spp_api.h"
+#include "spp_task.h"
 
 #include "time.h"
 #include "sys/time.h"
 
+#include "esp_vfs.h"
+#include "sys/unistd.h"
+
 #define SPP_TAG "SPP_ACCEPTOR_DEMO"
 #define SPP_SERVER_NAME "SPP_SERVER"
-#define EXAMPLE_DEVICE_NAME "BALANCE_SPP"
-#define SPP_SHOW_DATA 0
-#define SPP_SHOW_SPEED 1
-#define SPP_SHOW_MODE SPP_SHOW_DATA    /*Choose show mode: show data or speed*/
+#define EXAMPLE_DEVICE_NAME "ESP_SPP_ACCEPTOR"
 
-static uint16_t bt_handle;
-
-static const esp_spp_mode_t esp_spp_mode = ESP_SPP_MODE_CB;
-
-static struct timeval time_new, time_old;
-static long data_num = 0;
+static const esp_spp_mode_t esp_spp_mode = ESP_SPP_MODE_VFS;
 
 static const esp_spp_sec_t sec_mask = ESP_SPP_SEC_AUTHENTICATE;
 static const esp_spp_role_t role_slave = ESP_SPP_ROLE_SLAVE;
+
+#define SPP_DATA_LEN 100
 
 static char *bda2str(uint8_t *bda, char *str, size_t size)
 {
@@ -53,26 +59,53 @@ static char *bda2str(uint8_t *bda, char *str, size_t size)
     return str;
 }
 
-static void print_speed(void)
+
+static void spp_read_handle(void * param)
 {
-    float time_old_s = time_old.tv_sec + time_old.tv_usec / 1000000.0;
-    float time_new_s = time_new.tv_sec + time_new.tv_usec / 1000000.0;
-    float time_interval = time_new_s - time_old_s;
-    float speed = data_num * 8 / time_interval / 1000.0;
-    ESP_LOGI(SPP_TAG, "speed(%fs ~ %fs): %f kbit/s" , time_old_s, time_new_s, speed);
-    data_num = 0;
-    time_old.tv_sec = time_new.tv_sec;
-    time_old.tv_usec = time_new.tv_usec;
+    int size = 0;
+    int fd = (int)param;
+    uint8_t *spp_data = NULL;
+
+    spp_data = malloc(SPP_DATA_LEN);
+    if (!spp_data) {
+        ESP_LOGE(SPP_TAG, "malloc spp_data failed, fd:%d", fd);
+        goto done;
+    }
+
+    do {
+        /* The frequency of calling this function also limits the speed at which the peer device can send data. */
+        size = read(fd, spp_data, SPP_DATA_LEN);
+        if (size < 0) {
+            break;
+        } else if (size == 0) {
+            /* There is no data, retry after 500 ms */
+            vTaskDelay(500 / portTICK_PERIOD_MS);
+        } else {
+            ESP_LOGI(SPP_TAG, "fd = %d data_len = %d", fd, size);
+            esp_log_buffer_hex(SPP_TAG, spp_data, size);
+            /* To avoid task watchdog */
+            vTaskDelay(10 / portTICK_PERIOD_MS);
+        }
+    } while (1);
+done:
+    if (spp_data) {
+        free(spp_data);
+    }
+    spp_wr_task_shut_down();
 }
 
-static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
+static void esp_spp_cb(uint16_t e, void *p)
 {
+    esp_spp_cb_event_t event = e;
+    esp_spp_cb_param_t *param = p;
     char bda_str[18] = {0};
 
     switch (event) {
     case ESP_SPP_INIT_EVT:
         if (param->init.status == ESP_SPP_SUCCESS) {
             ESP_LOGI(SPP_TAG, "ESP_SPP_INIT_EVT");
+            /* Enable SPP VFS mode */
+            esp_spp_vfs_register();
             esp_spp_start_srv(sec_mask, role_slave, 0, SPP_SERVER_NAME);
         } else {
             ESP_LOGE(SPP_TAG, "ESP_SPP_INIT_EVT status:%d", param->init.status);
@@ -85,7 +118,6 @@ static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
         ESP_LOGI(SPP_TAG, "ESP_SPP_OPEN_EVT");
         break;
     case ESP_SPP_CLOSE_EVT:
-        bt_handle = 0;
         ESP_LOGI(SPP_TAG, "ESP_SPP_CLOSE_EVT status:%d handle:%d close_by_remote:%d", param->close.status,
                  param->close.handle, param->close.async);
         break;
@@ -102,59 +134,31 @@ static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
     case ESP_SPP_CL_INIT_EVT:
         ESP_LOGI(SPP_TAG, "ESP_SPP_CL_INIT_EVT");
         break;
-    case ESP_SPP_DATA_IND_EVT:
-#if (SPP_SHOW_MODE == SPP_SHOW_DATA)
-        /*
-         * We only show the data in which the data length is less than 128 here. If you want to print the data and
-         * the data rate is high, it is strongly recommended to process them in other lower priority application task
-         * rather than in this callback directly. Since the printing takes too much time, it may stuck the Bluetooth
-         * stack and also have a effect on the throughput!
-         */
-        ESP_LOGI(SPP_TAG, "ESP_SPP_DATA_IND_EVT len:%d handle:%d",
-                 param->data_ind.len, param->data_ind.handle);
-        if (param->data_ind.len < 128) {
-            esp_log_buffer_hex("", param->data_ind.data, param->data_ind.len);
-        }
-#else
-        gettimeofday(&time_new, NULL);
-        data_num += param->data_ind.len;
-        if (time_new.tv_sec - time_old.tv_sec >= 3) {
-            print_speed();
-        }
-#endif
-        break;
-    case ESP_SPP_CONG_EVT:
-        ESP_LOGI(SPP_TAG, "ESP_SPP_CONG_EVT");
-        break;
-    case ESP_SPP_WRITE_EVT:
-        ESP_LOGI(SPP_TAG, "ESP_SPP_WRITE_EVT");
-        break;
     case ESP_SPP_SRV_OPEN_EVT:
-        bt_handle = param->cong.handle;
         ESP_LOGI(SPP_TAG, "ESP_SPP_SRV_OPEN_EVT status:%d handle:%d, rem_bda:[%s]", param->srv_open.status,
                  param->srv_open.handle, bda2str(param->srv_open.rem_bda, bda_str, sizeof(bda_str)));
-        gettimeofday(&time_old, NULL);
-        break;
-    case ESP_SPP_SRV_STOP_EVT:
-        ESP_LOGI(SPP_TAG, "ESP_SPP_SRV_STOP_EVT");
-        break;
-    case ESP_SPP_UNINIT_EVT:
-        ESP_LOGI(SPP_TAG, "ESP_SPP_UNINIT_EVT");
+        if (param->srv_open.status == ESP_SPP_SUCCESS) {
+            spp_wr_task_start_up(spp_read_handle, param->srv_open.fd);
+        }
         break;
     default:
         break;
     }
 }
 
+static void esp_spp_stack_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
+{
+    /* To avoid stucking Bluetooth stack, we dispatch the SPP callback event to the other lower priority task */
+    spp_task_work_dispatch(esp_spp_cb, event, param, sizeof(esp_spp_cb_param_t), NULL);
+}
+
 void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *param)
 {
-    char bda_str[18] = {0};
-
     switch (event) {
     case ESP_BT_GAP_AUTH_CMPL_EVT:{
         if (param->auth_cmpl.stat == ESP_BT_STATUS_SUCCESS) {
-            ESP_LOGI(SPP_TAG, "authentication success: %s bda:[%s]", param->auth_cmpl.device_name,
-                     bda2str(param->auth_cmpl.bda, bda_str, sizeof(bda_str)));
+            ESP_LOGI(SPP_TAG, "authentication success: %s", param->auth_cmpl.device_name);
+            esp_log_buffer_hex(SPP_TAG, param->auth_cmpl.bda, ESP_BD_ADDR_LEN);
         } else {
             ESP_LOGE(SPP_TAG, "authentication failed, status:%d", param->auth_cmpl.stat);
         }
@@ -192,8 +196,7 @@ void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *param)
 #endif
 
     case ESP_BT_GAP_MODE_CHG_EVT:
-        ESP_LOGI(SPP_TAG, "ESP_BT_GAP_MODE_CHG_EVT mode:%d bda:[%s]", param->mode_chg.mode,
-                 bda2str(param->mode_chg.bda, bda_str, sizeof(bda_str)));
+        ESP_LOGI(SPP_TAG, "ESP_BT_GAP_MODE_CHG_EVT mode:%d", param->mode_chg.mode);
         break;
 
     default: {
@@ -217,38 +220,40 @@ void app_main(void)
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_BLE));
 
     esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
-    if ((ret = esp_bt_controller_init(&bt_cfg)) != ESP_OK) {
-        ESP_LOGE(SPP_TAG, "%s initialize controller failed: %s\n", __func__, esp_err_to_name(ret));
+    if (esp_bt_controller_init(&bt_cfg) != ESP_OK) {
+        ESP_LOGE(SPP_TAG, "%s initialize controller failed", __func__);
         return;
     }
 
-    if ((ret = esp_bt_controller_enable(ESP_BT_MODE_CLASSIC_BT)) != ESP_OK) {
-        ESP_LOGE(SPP_TAG, "%s enable controller failed: %s\n", __func__, esp_err_to_name(ret));
+    if (esp_bt_controller_enable(ESP_BT_MODE_CLASSIC_BT) != ESP_OK) {
+        ESP_LOGE(SPP_TAG, "%s enable controller failed", __func__);
         return;
     }
 
-    if ((ret = esp_bluedroid_init()) != ESP_OK) {
-        ESP_LOGE(SPP_TAG, "%s initialize bluedroid failed: %s\n", __func__, esp_err_to_name(ret));
+    if (esp_bluedroid_init() != ESP_OK) {
+        ESP_LOGE(SPP_TAG, "%s initialize bluedroid failed", __func__);
         return;
     }
 
-    if ((ret = esp_bluedroid_enable()) != ESP_OK) {
-        ESP_LOGE(SPP_TAG, "%s enable bluedroid failed: %s\n", __func__, esp_err_to_name(ret));
+    if (esp_bluedroid_enable() != ESP_OK) {
+        ESP_LOGE(SPP_TAG, "%s enable bluedroid failed", __func__);
         return;
     }
 
-    if ((ret = esp_bt_gap_register_callback(esp_bt_gap_cb)) != ESP_OK) {
+    if (esp_bt_gap_register_callback(esp_bt_gap_cb) != ESP_OK) {
         ESP_LOGE(SPP_TAG, "%s gap register failed: %s\n", __func__, esp_err_to_name(ret));
         return;
     }
 
-    if ((ret = esp_spp_register_callback(esp_spp_cb)) != ESP_OK) {
-        ESP_LOGE(SPP_TAG, "%s spp register failed: %s\n", __func__, esp_err_to_name(ret));
+    if (esp_spp_register_callback(esp_spp_stack_cb) != ESP_OK) {
+        ESP_LOGE(SPP_TAG, "%s spp register failed", __func__);
         return;
     }
 
-    if ((ret = esp_spp_init(esp_spp_mode)) != ESP_OK) {
-        ESP_LOGE(SPP_TAG, "%s spp init failed: %s\n", __func__, esp_err_to_name(ret));
+    spp_task_task_start_up();
+
+    if (esp_spp_init(esp_spp_mode) != ESP_OK) {
+        ESP_LOGE(SPP_TAG, "%s spp init failed", __func__);
         return;
     }
 
@@ -263,20 +268,9 @@ void app_main(void)
      * Set default parameters for Legacy Pairing
      * Use variable pin, input pin code when pairing
      */
-    // esp_bt_pin_type_t pin_type = ESP_BT_PIN_TYPE_VARIABLE;
-    // esp_bt_pin_code_t pin_code;
-    // esp_bt_gap_set_pin(pin_type, 0, pin_code);
+    esp_bt_pin_type_t pin_type = ESP_BT_PIN_TYPE_VARIABLE;
+    esp_bt_pin_code_t pin_code;
+    esp_bt_gap_set_pin(pin_type, 0, pin_code);
 
     ESP_LOGI(SPP_TAG, "Own address:[%s]", bda2str((uint8_t *)esp_bt_dev_get_address(), bda_str, sizeof(bda_str)));
-
-    uint8_t data[] = {"{A1:2:3:4}$"};
-    while(1)
-    {
-        vTaskDelay(30/portTICK_PERIOD_MS);
-        if(bt_handle != 0)
-        {
-            esp_spp_write(bt_handle, strlen((char *)data), data);
-        }
-    }
 }
- 
