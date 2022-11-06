@@ -30,6 +30,8 @@ static void spp_task_work_dispatched(spp_task_msg_t *msg);
 static xQueueHandle spp_task_task_queue = NULL;
 static xTaskHandle spp_task_task_handle = NULL;
 
+static uint8_t data[] = {"{A1:2:3:4}$"};
+
 bool spp_task_work_dispatch(spp_task_cb_t p_cback, uint16_t event, void *p_params, int param_len, spp_task_copy_cb_t p_copy_cback)
 {
     ESP_LOGD(SPP_TASK_TAG, "%s event 0x%x, param len %d", __func__, event, param_len);
@@ -60,14 +62,19 @@ bool spp_task_work_dispatch(spp_task_cb_t p_cback, uint16_t event, void *p_param
 void spp_task_wr_cb(uint16_t event, esp_spp_cb_param_t *param)
 {
     switch (event) {
-    case ESP_SPP_DATA_IND_EVT:    
-    ESP_LOGI(SPP_TASK_TAG, "ESP_SPP_DATA_IND_EVT len:%d handle:%d",
+        case ESP_SPP_DATA_IND_EVT:    
+        ESP_LOGI(SPP_TASK_TAG, "ESP_SPP_DATA_IND_EVT len:%d handle:%d",
                 param->data_ind.len, param->data_ind.handle);
-    if (param->data_ind.len < 128) {
-        esp_log_buffer_hex("", param->data_ind.data, param->data_ind.len);
-    }
-    printf("     esp_get_free_heap_size : %d  \n", esp_get_free_heap_size());
+        if (param->data_ind.len < 128) {
+            esp_log_buffer_hex("", param->data_ind.data, param->data_ind.len);
+        }
+        printf("     esp_get_free_heap_size : %d  \n", esp_get_free_heap_size());
         break;
+    case ESP_SPP_WRITE_EVT:
+        esp_spp_write(param->write.handle, strlen((char *)data), data);
+        break;
+    // case ESP_SPP_OPEN_EVT:
+    //     esp_spp_write(param->srv_open.handle, strlen((char *)data), data);
     }
 }
 
@@ -80,7 +87,7 @@ void spp_task_copy_cb(spp_task_msg_t *msg, esp_spp_cb_param_t *p_dest, esp_spp_c
 
 void spp_task_free_cb(spp_task_msg_t *msg, esp_spp_cb_param_t *p_dest)
 {
-    if(p_dest->data_ind.data)
+    if(p_dest->data_ind.data && msg->event == ESP_SPP_DATA_IND_EVT)
         free(p_dest->data_ind.data);
 }  
 
@@ -123,7 +130,7 @@ static void spp_task_task_handler(spp_task_free_cb_t spp_task_free_cb)
                 /* check if caller has provided a free callback to do the deep free */
                 if (spp_task_free_cb) {
                     spp_task_free_cb(&msg, (esp_spp_cb_param_t *)msg.param);
-                }
+                } 
                 free(msg.param);
             }
         }
