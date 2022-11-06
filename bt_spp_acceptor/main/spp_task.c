@@ -104,7 +104,7 @@ static void spp_task_work_dispatched(spp_task_msg_t *msg)
     }
 }
 
-static void spp_task_task_handler(spp_task_free_cb_t arg)
+static void spp_task_task_handler(spp_task_free_cb_t spp_task_free_cb)
 {
     spp_task_msg_t msg;
     for (;;) {
@@ -121,8 +121,8 @@ static void spp_task_task_handler(spp_task_free_cb_t arg)
 
             if (msg.param) {
                 /* check if caller has provided a free callback to do the deep free */
-                if (arg) {
-                    arg(&msg, (esp_spp_cb_param_t *)msg.param);
+                if (spp_task_free_cb) {
+                    spp_task_free_cb(&msg, (esp_spp_cb_param_t *)msg.param);
                 }
                 free(msg.param);
             }
@@ -133,7 +133,7 @@ static void spp_task_task_handler(spp_task_free_cb_t arg)
 void spp_task_task_start_up(void)
 {
     spp_task_task_queue = xQueueCreate(10, sizeof(spp_task_msg_t));
-    xTaskCreate(spp_task_task_handler, "SPPAppT", 2048, spp_task_free_cb, 10, &spp_task_task_handle);
+    xTaskCreate(spp_task_task_handler, "SPPAppT", 4096, spp_task_free_cb, 10, &spp_task_task_handle);
     return;
 }
 
