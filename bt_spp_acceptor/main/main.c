@@ -127,10 +127,10 @@ static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
 #endif
         break;
     case ESP_SPP_CONG_EVT:
-        ESP_LOGI(SPP_TAG, "ESP_SPP_CONG_EVT");
+        // ESP_LOGI(SPP_TAG, "ESP_SPP_CONG_EVT");
         break;
     case ESP_SPP_WRITE_EVT:
-        ESP_LOGI(SPP_TAG, "ESP_SPP_WRITE_EVT");
+        // ESP_LOGI(SPP_TAG, "ESP_SPP_WRITE_EVT");
         spp_task_work_dispatch(spp_task_wr_cb, event, param, sizeof(esp_spp_cb_param_t), NULL);
         break;
     case ESP_SPP_SRV_OPEN_EVT:
@@ -138,7 +138,7 @@ static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
         ESP_LOGI(SPP_TAG, "ESP_SPP_SRV_OPEN_EVT status:%d handle:%d, rem_bda:[%s]", param->srv_open.status,
                  param->srv_open.handle, bda2str(param->srv_open.rem_bda, bda_str, sizeof(bda_str)));
         gettimeofday(&time_old, NULL);
-        esp_spp_write(param->srv_open.handle, strlen((char *)data), data);
+        spp_task_work_dispatch(spp_task_wr_cb, event, param, sizeof(esp_spp_cb_param_t), NULL);
         break;
     case ESP_SPP_SRV_STOP_EVT:
         ESP_LOGI(SPP_TAG, "ESP_SPP_SRV_STOP_EVT");

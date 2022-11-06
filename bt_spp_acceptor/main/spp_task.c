@@ -73,8 +73,8 @@ void spp_task_wr_cb(uint16_t event, esp_spp_cb_param_t *param)
     case ESP_SPP_WRITE_EVT:
         esp_spp_write(param->write.handle, strlen((char *)data), data);
         break;
-    // case ESP_SPP_OPEN_EVT:
-    //     esp_spp_write(param->srv_open.handle, strlen((char *)data), data);
+    case ESP_SPP_SRV_OPEN_EVT:
+        esp_spp_write(param->srv_open.handle, strlen((char *)data), data);
     }
 }
 
