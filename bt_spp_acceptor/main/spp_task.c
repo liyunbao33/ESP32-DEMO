@@ -23,14 +23,14 @@
 #include "esp_log.h"
 #include "spp_task.h"
 
-static void spp_task_task_handler(void *arg);
+static void spp_task_task_handler(spp_task_free_cb_t arg);
 static bool spp_task_send_msg(spp_task_msg_t *msg);
 static void spp_task_work_dispatched(spp_task_msg_t *msg);
 
 static xQueueHandle spp_task_task_queue = NULL;
 static xTaskHandle spp_task_task_handle = NULL;
 
-bool spp_task_work_dispatch(spp_task_cb_t p_cback, uint16_t event, esp_spp_cb_param_t *p_params, int param_len, spp_task_copy_cb_t p_copy_cback)
+bool spp_task_work_dispatch(spp_task_cb_t p_cback, uint16_t event, void *p_params, int param_len, spp_task_copy_cb_t p_copy_cback)
 {
     ESP_LOGD(SPP_TASK_TAG, "%s event 0x%x, param len %d", __func__, event, param_len);
 
@@ -44,11 +44,11 @@ bool spp_task_work_dispatch(spp_task_cb_t p_cback, uint16_t event, esp_spp_cb_pa
     if (param_len == 0) {
         return spp_task_send_msg(&msg);
     } else if (p_params && param_len > 0) {
-        if ((msg.param = malloc(p_params->data_ind.len)) != NULL) {
-            memcpy(msg.param, p_params->data_ind.data, p_params->data_ind.len);
+        if ((msg.param = malloc(param_len)) != NULL) {
+            memcpy(msg.param, p_params, param_len);
             /* check if caller has provided a copy callback to do the deep copy */
             if (p_copy_cback) {
-                p_copy_cback(&msg, msg.param, p_params);
+                p_copy_cback(&msg, (esp_spp_cb_param_t *)msg.param, (esp_spp_cb_param_t *)p_params);
             }
             return spp_task_send_msg(&msg);
         }
@@ -57,20 +57,34 @@ bool spp_task_work_dispatch(spp_task_cb_t p_cback, uint16_t event, esp_spp_cb_pa
     return false;
 }
 
-void spp_task_wr_cb(uint16_t event, void *param)
+void spp_task_wr_cb(uint16_t event, esp_spp_cb_param_t *param)
 {
     switch (event) {
     case ESP_SPP_DATA_IND_EVT:    
-    // ESP_LOGI(SPP_TASK_TAG, "ESP_SPP_DATA_IND_EVT len:%d handle:%d",
-    //             param->data_ind.len, param->data_ind.handle);
-    // if (param->data_ind.len < 128) {
-        esp_log_buffer_hex("", param, 1);
-    // }
+    ESP_LOGI(SPP_TASK_TAG, "ESP_SPP_DATA_IND_EVT len:%d handle:%d",
+                param->data_ind.len, param->data_ind.handle);
+    if (param->data_ind.len < 128) {
+        esp_log_buffer_hex("", param->data_ind.data, param->data_ind.len);
+    }
+    printf("     esp_get_free_heap_size : %d  \n", esp_get_free_heap_size());
         break;
     }
 }
 
-static bool spp_task_send_msg(spp_task_msg_t *msg)
+void spp_task_copy_cb(spp_task_msg_t *msg, esp_spp_cb_param_t *p_dest, esp_spp_cb_param_t *p_src)
+{
+     if ((p_dest->data_ind.data = malloc(p_src->data_ind.len)) != NULL) {
+            memcpy(p_dest->data_ind.data, p_src->data_ind.data, p_src->data_ind.len);
+     }
+}  
+
+void spp_task_free_cb(spp_task_msg_t *msg, esp_spp_cb_param_t *p_dest)
+{
+    if(p_dest->data_ind.data)
+        free(p_dest->data_ind.data);
+}  
+
+static bool spp_task_send_msg(spp_task_msg_t *msg) 
 {
     if (msg == NULL) {
         return false;
@@ -90,7 +104,7 @@ static void spp_task_work_dispatched(spp_task_msg_t *msg)
     }
 }
 
-static void spp_task_task_handler(void *arg)
+static void spp_task_task_handler(spp_task_free_cb_t arg)
 {
     spp_task_msg_t msg;
     for (;;) {
@@ -106,6 +120,10 @@ static void spp_task_task_handler(void *arg)
             }
 
             if (msg.param) {
+                /* check if caller has provided a free callback to do the deep free */
+                if (arg) {
+                    arg(&msg, (esp_spp_cb_param_t *)msg.param);
+                }
                 free(msg.param);
             }
         }
@@ -115,7 +133,7 @@ static void spp_task_task_handler(void *arg)
 void spp_task_task_start_up(void)
 {
     spp_task_task_queue = xQueueCreate(10, sizeof(spp_task_msg_t));
-    xTaskCreate(spp_task_task_handler, "SPPAppT", 2048, NULL, 10, &spp_task_task_handle);
+    xTaskCreate(spp_task_task_handler, "SPPAppT", 2048, spp_task_free_cb, 10, &spp_task_task_handle);
     return;
 }
 
@@ -139,3 +157,4 @@ void spp_task_task_shut_down(void)
 // {
 //     vTaskDelete(NULL);
 // }
+

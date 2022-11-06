@@ -116,7 +116,7 @@ static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
         // if (param->data_ind.len < 128) {
         //     esp_log_buffer_hex("", param->data_ind.data, param->data_ind.len);
         // }
-        spp_task_work_dispatch(spp_task_wr_cb, event, param, sizeof(esp_spp_cb_param_t), NULL);
+        spp_task_work_dispatch(spp_task_wr_cb, event, param, sizeof(esp_spp_cb_param_t), spp_task_copy_cb);
 #else
         gettimeofday(&time_new, NULL);
         data_num += param->data_ind.len;

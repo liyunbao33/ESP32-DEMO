@@ -27,7 +27,7 @@
 /**
  * @brief     handler for the dispatched work
  */
-typedef void (* spp_task_cb_t) (uint16_t event, void *param);
+typedef void (* spp_task_cb_t) (uint16_t event, esp_spp_cb_param_t *param);
 
 /* message to be sent */
 typedef struct {
@@ -40,13 +40,15 @@ typedef struct {
 // /**
 //  * @brief     parameter deep-copy function to be customized
 //  */
-typedef void (* spp_task_copy_cb_t) (spp_task_msg_t *msg, void *p_dest, void *p_src);
-
+typedef void (* spp_task_copy_cb_t) (spp_task_msg_t *msg, esp_spp_cb_param_t *p_dest, esp_spp_cb_param_t *p_src);
+typedef void (* spp_task_free_cb_t) (spp_task_msg_t *msg, esp_spp_cb_param_t *p_dest);
 /**
  * @brief     work dispatcher for the application task
  */
-bool spp_task_work_dispatch(spp_task_cb_t p_cback, uint16_t event, esp_spp_cb_param_t *p_params, int param_len, spp_task_copy_cb_t p_copy_cback);
-void spp_task_wr_cb(uint16_t event, void *param);
+bool spp_task_work_dispatch(spp_task_cb_t p_cback, uint16_t event, void *p_params, int param_len, spp_task_copy_cb_t p_copy_cback);
+void spp_task_wr_cb(uint16_t event, esp_spp_cb_param_t *param);
+void spp_task_copy_cb(spp_task_msg_t *msg, esp_spp_cb_param_t *p_dest, esp_spp_cb_param_t *p_src);
+void spp_task_free_cb(spp_task_msg_t *msg, esp_spp_cb_param_t *p_dest);
 
 void spp_task_task_start_up(void);
  
