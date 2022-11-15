@@ -28,4 +28,7 @@ lvgl/.vscode
 bt_spp_vfs_acceptor/build
 bt_spp_vfs_acceptor/.vscode
 
+uart_async_rxtxtasks/build
+uart_async_rxtxtasks/.vscode
+
 
