@@ -115,6 +115,7 @@ static void spp_task_task_handler(spp_task_free_cb_t spp_task_free_cb)
 {
     spp_task_msg_t msg;
     for (;;) {
+        vTaskDelay(1);
         if (pdTRUE == xQueueReceive(spp_task_task_queue, &msg, (portTickType)portMAX_DELAY)) {
             ESP_LOGD(SPP_TASK_TAG, "%s, sig 0x%x, 0x%x", __func__, msg.sig, msg.event);
             switch (msg.sig) {
