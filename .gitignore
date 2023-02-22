@@ -31,4 +31,7 @@ bt_spp_vfs_acceptor/.vscode
 uart_async_rxtxtasks/build
 uart_async_rxtxtasks/.vscode
 
+real_time_stats/build
+real_time_stats/.vscode
+
 
