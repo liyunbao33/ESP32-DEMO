@@ -17,6 +17,7 @@
 #include "driver/gpio.h"
 #include "power.h"
 #include "uart.h"
+#include "protocol.h"
 
 // #define NUM_OF_SPIN_TASKS   6
 // #define SPIN_ITER           500000  //Actual CPU cycles used will depend on compiler optimization
