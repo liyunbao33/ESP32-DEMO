@@ -16,11 +16,12 @@
 #include "esp_log.h"
 #include "driver/gpio.h"
 #include "power.h"
+#include "uart.h"
 
 // #define NUM_OF_SPIN_TASKS   6
 // #define SPIN_ITER           500000  //Actual CPU cycles used will depend on compiler optimization
 // #define SPIN_TASK_PRIO      2
-#define STATS_TASK_PRIO 1
+// #define STATS_TASK_PRIO 1
 // #define STATS_TICKS         pdMS_TO_TICKS(1000)
 // #define ARRAY_SIZE_OFFSET   5   //Increase this if print_real_time_stats returns ESP_ERR_INVALID_SIZE
 
@@ -190,6 +191,7 @@ static void task2(void *arg)
 void app_main(void)
 {
     pow_init();
+    uart_init();
     // Allow other core to finish initialization
     vTaskDelay(pdMS_TO_TICKS(100));
 
@@ -207,8 +209,8 @@ void app_main(void)
     // xTaskCreatePinnedToCore(stats_task, "stats", 4096, NULL, STATS_TASK_PRIO, NULL, tskNO_AFFINITY);
     // xSemaphoreGive(sync_stats_task);
 
-    xTaskCreatePinnedToCore(task1, "stats", 4096, NULL, STATS_TASK_PRIO, NULL, tskNO_AFFINITY);
-    xTaskCreatePinnedToCore(task2, "stats1", 4096, NULL, 2, NULL, tskNO_AFFINITY);
+    xTaskCreatePinnedToCore(uart_rx_task, "uart_rx_task", 4096, NULL, configMAX_PRIORITIES, NULL, tskNO_AFFINITY);
+    xTaskCreatePinnedToCore(uart_tx_task, "uart_tx_task", 4096, NULL, configMAX_PRIORITIES - 1, NULL, tskNO_AFFINITY);
 
     while (1)
     {
