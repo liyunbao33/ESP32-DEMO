@@ -9,15 +9,9 @@
  * 
  */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/task.h"
-#include "freertos/semphr.h"
-#include "esp_err.h"
-#include "esp_log.h"
 #include "driver/gpio.h"
 
+#define POW_GPIO 4
 
 void pow_init(void)
 {

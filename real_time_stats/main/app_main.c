@@ -168,7 +168,6 @@
 //     }
 // }
 static const char *TAG = "main";
-#define POW_GPIO 4
 
 static void task1(void *arg)
 {
