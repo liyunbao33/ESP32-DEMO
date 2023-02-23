@@ -15,6 +15,7 @@
 #include "esp_err.h"
 #include "esp_log.h"
 #include "driver/gpio.h"
+#include "power.h"
 
 // #define NUM_OF_SPIN_TASKS   6
 // #define SPIN_ITER           500000  //Actual CPU cycles used will depend on compiler optimization
@@ -189,8 +190,7 @@ static void task2(void *arg)
 
 void app_main(void)
 {
-    gpio_set_direction(POW_GPIO, GPIO_MODE_OUTPUT);
-    gpio_set_level(POW_GPIO, 1);
+    pow_init();
     // Allow other core to finish initialization
     vTaskDelay(pdMS_TO_TICKS(100));
 
