@@ -34,4 +34,8 @@ uart_async_rxtxtasks/.vscode
 real_time_stats/build
 real_time_stats/.vscode
 
+default_event_loop/build
+default_event_loop/.vscode
 
+user_event_loops/build
+user_event_loops/.vscode
