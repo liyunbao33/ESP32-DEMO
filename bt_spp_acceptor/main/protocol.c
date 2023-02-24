@@ -75,14 +75,12 @@ void Protocol_Process(void)
 
     if (memcmp(dataBackup, frame.Data, PROTOCOL_NUM_MAX) != 0)
     {
-        uint8_t i;
-
         nrfTxdBuf[0] = 0x3C;
         nrfTxdBuf[1] = 0xA1;
         nrfTxdBuf[2] = PROTOCOL_NUM_MAX;
         memcpy(&nrfTxdBuf[3], frame.Data, PROTOCOL_NUM_MAX);
         nrfTxdBuf[3 + PROTOCOL_NUM_MAX] = 0x00;
-        for (i = 0; i < (3 + PROTOCOL_NUM_MAX); i++) // 计算校验和
+        for (uint8_t i = 0; i < (3 + PROTOCOL_NUM_MAX); i++) // 计算校验和
         {
             nrfTxdBuf[3 + PROTOCOL_NUM_MAX] += nrfTxdBuf[i];
         }

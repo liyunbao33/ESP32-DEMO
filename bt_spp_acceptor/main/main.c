@@ -36,12 +36,11 @@
 #define EXAMPLE_DEVICE_NAME "BALANCE_SPP"
 #define SPP_SHOW_DATA 0
 #define SPP_SHOW_SPEED 1
-#define SPP_SHOW_MODE SPP_SHOW_DATA    /*Choose show mode: show data or speed*/
-static uint8_t data[] = {"{A1:2:3:4}$"};
+#define SPP_SHOW_MODE SPP_SHOW_DATA /*Choose show mode: show data or speed*/
 
 static uint16_t bt_handle;
 
-// static const esp_spp_mode_t esp_spp_mode = ESP_SPP_MODE_CB;
+static const esp_spp_mode_t esp_spp_mode = ESP_SPP_MODE_CB;
 
 static struct timeval time_new, time_old;
 static long data_num = 0;
@@ -51,7 +50,8 @@ static const esp_spp_role_t role_slave = ESP_SPP_ROLE_SLAVE;
 
 static char *bda2str(uint8_t *bda, char *str, size_t size)
 {
-    if (bda == NULL || str == NULL || size < 18) {
+    if (bda == NULL || str == NULL || size < 18)
+    {
         return NULL;
     }
 
@@ -67,7 +67,7 @@ static void print_speed(void)
     float time_new_s = time_new.tv_sec + time_new.tv_usec / 1000000.0;
     float time_interval = time_new_s - time_old_s;
     float speed = data_num * 8 / time_interval / 1000.0;
-    ESP_LOGI(SPP_TAG, "speed(%fs ~ %fs): %f kbit/s" , time_old_s, time_new_s, speed);
+    ESP_LOGI(SPP_TAG, "speed(%fs ~ %fs): %f kbit/s", time_old_s, time_new_s, speed);
     data_num = 0;
     time_old.tv_sec = time_new.tv_sec;
     time_old.tv_usec = time_new.tv_usec;
@@ -77,12 +77,16 @@ static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
 {
     char bda_str[18] = {0};
 
-    switch (event) {
+    switch (event)
+    {
     case ESP_SPP_INIT_EVT:
-        if (param->init.status == ESP_SPP_SUCCESS) {
+        if (param->init.status == ESP_SPP_SUCCESS)
+        {
             ESP_LOGI(SPP_TAG, "ESP_SPP_INIT_EVT");
             esp_spp_start_srv(sec_mask, role_slave, 0, SPP_SERVER_NAME);
-        } else {
+        }
+        else
+        {
             ESP_LOGE(SPP_TAG, "ESP_SPP_INIT_EVT status:%d", param->init.status);
         }
         break;
@@ -98,12 +102,15 @@ static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
                  param->close.handle, param->close.async);
         break;
     case ESP_SPP_START_EVT:
-        if (param->start.status == ESP_SPP_SUCCESS) {
+        if (param->start.status == ESP_SPP_SUCCESS)
+        {
             ESP_LOGI(SPP_TAG, "ESP_SPP_START_EVT handle:%d sec_id:%d scn:%d", param->start.handle, param->start.sec_id,
                      param->start.scn);
             esp_bt_dev_set_device_name(EXAMPLE_DEVICE_NAME);
             esp_bt_gap_set_scan_mode(ESP_BT_CONNECTABLE, ESP_BT_GENERAL_DISCOVERABLE);
-        } else {
+        }
+        else
+        {
             ESP_LOGE(SPP_TAG, "ESP_SPP_START_EVT status:%d", param->start.status);
         }
         break;
@@ -127,7 +134,8 @@ static void esp_spp_cb(esp_spp_cb_event_t event, esp_spp_cb_param_t *param)
 #else
         gettimeofday(&time_new, NULL);
         data_num += param->data_ind.len;
-        if (time_new.tv_sec - time_old.tv_sec >= 3) {
+        if (time_new.tv_sec - time_old.tv_sec >= 3)
+        {
             print_speed();
         }
 #endif
@@ -161,23 +169,32 @@ void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *param)
 {
     char bda_str[18] = {0};
 
-    switch (event) {
-    case ESP_BT_GAP_AUTH_CMPL_EVT:{
-        if (param->auth_cmpl.stat == ESP_BT_STATUS_SUCCESS) {
+    switch (event)
+    {
+    case ESP_BT_GAP_AUTH_CMPL_EVT:
+    {
+        if (param->auth_cmpl.stat == ESP_BT_STATUS_SUCCESS)
+        {
             ESP_LOGI(SPP_TAG, "authentication success: %s bda:[%s]", param->auth_cmpl.device_name,
                      bda2str(param->auth_cmpl.bda, bda_str, sizeof(bda_str)));
-        } else {
+        }
+        else
+        {
             ESP_LOGE(SPP_TAG, "authentication failed, status:%d", param->auth_cmpl.stat);
         }
         break;
     }
-    case ESP_BT_GAP_PIN_REQ_EVT:{
+    case ESP_BT_GAP_PIN_REQ_EVT:
+    {
         ESP_LOGI(SPP_TAG, "ESP_BT_GAP_PIN_REQ_EVT min_16_digit:%d", param->pin_req.min_16_digit);
-        if (param->pin_req.min_16_digit) {
+        if (param->pin_req.min_16_digit)
+        {
             ESP_LOGI(SPP_TAG, "Input pin code: 0000 0000 0000 0000");
             esp_bt_pin_code_t pin_code = {0};
             esp_bt_gap_pin_reply(param->pin_req.bda, true, 16, pin_code);
-        } else {
+        }
+        else
+        {
             ESP_LOGI(SPP_TAG, "Input pin code: 1234");
             esp_bt_pin_code_t pin_code;
             pin_code[0] = '1';
@@ -207,7 +224,8 @@ void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *param)
                  bda2str(param->mode_chg.bda, bda_str, sizeof(bda_str)));
         break;
 
-    default: {
+    default:
+    {
         ESP_LOGI(SPP_TAG, "event: %d", event);
         break;
     }
@@ -215,82 +233,89 @@ void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *param)
     return;
 }
 
+static void bt_spp_on(void)
+{
+    char bda_str[18] = {0};
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
+    {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
+
+    ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_BLE));
+
+    esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
+    if ((ret = esp_bt_controller_init(&bt_cfg)) != ESP_OK)
+    {
+        ESP_LOGE(SPP_TAG, "%s initialize controller failed: %s\n", __func__, esp_err_to_name(ret));
+        return;
+    }
+
+    if ((ret = esp_bt_controller_enable(ESP_BT_MODE_CLASSIC_BT)) != ESP_OK)
+    {
+        ESP_LOGE(SPP_TAG, "%s enable controller failed: %s\n", __func__, esp_err_to_name(ret));
+        return;
+    }
+
+    if ((ret = esp_bluedroid_init()) != ESP_OK)
+    {
+        ESP_LOGE(SPP_TAG, "%s initialize bluedroid failed: %s\n", __func__, esp_err_to_name(ret));
+        return;
+    }
+
+    if ((ret = esp_bluedroid_enable()) != ESP_OK)
+    {
+        ESP_LOGE(SPP_TAG, "%s enable bluedroid failed: %s\n", __func__, esp_err_to_name(ret));
+        return;
+    }
+
+    if ((ret = esp_bt_gap_register_callback(esp_bt_gap_cb)) != ESP_OK)
+    {
+        ESP_LOGE(SPP_TAG, "%s gap register failed: %s\n", __func__, esp_err_to_name(ret));
+        return;
+    }
+
+    if ((ret = esp_spp_register_callback(esp_spp_cb)) != ESP_OK)
+    {
+        ESP_LOGE(SPP_TAG, "%s spp register failed: %s\n", __func__, esp_err_to_name(ret));
+        return;
+    }
+
+    if ((ret = esp_spp_init(esp_spp_mode)) != ESP_OK)
+    {
+        ESP_LOGE(SPP_TAG, "%s spp init failed: %s\n", __func__, esp_err_to_name(ret));
+        return;
+    }
+
+#if (CONFIG_BT_SSP_ENABLED == true)
+    /* Set default parameters for Secure Simple Pairing */
+    esp_bt_sp_param_t param_type = ESP_BT_SP_IOCAP_MODE;
+    esp_bt_io_cap_t iocap = ESP_BT_IO_CAP_IO;
+    esp_bt_gap_set_security_param(param_type, &iocap, sizeof(uint8_t));
+#endif
+
+    /*
+     * Set default parameters for Legacy Pairing
+     * Use variable pin, input pin code when pairing
+     */
+    esp_bt_pin_type_t pin_type = ESP_BT_PIN_TYPE_VARIABLE;
+    esp_bt_pin_code_t pin_code;
+    esp_bt_gap_set_pin(pin_type, 0, pin_code);
+
+    ESP_LOGI(SPP_TAG, "Own address:[%s]", bda2str((uint8_t *)esp_bt_dev_get_address(), bda_str, sizeof(bda_str)));
+
+    spp_task_task_start_up();
+}
+
+static void bt_spp_off(void)
+{
+    ;
+}
+
 void app_main(void)
 {
-
-    pow_init();
-    uart_init();
-    // Allow other core to finish initialization
-    vTaskDelay(pdMS_TO_TICKS(100));
-
-    xTaskCreatePinnedToCore(uart_rx_task, "uart_rx_task", 4096, NULL, configMAX_PRIORITIES, NULL, tskNO_AFFINITY);
-    xTaskCreatePinnedToCore(uart_tx_task, "uart_tx_task", 4096, NULL, configMAX_PRIORITIES - 1, NULL, tskNO_AFFINITY);
-
-    //     char bda_str[18] = {0};
-    //     esp_err_t ret = nvs_flash_init();
-    //     if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND) {
-    //         ESP_ERROR_CHECK(nvs_flash_erase());
-    //         ret = nvs_flash_init();
-    //     }
-    //     ESP_ERROR_CHECK( ret );
-
-    //     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_BLE));
-
-    //     esp_bt_controller_config_t bt_cfg = BT_CONTROLLER_INIT_CONFIG_DEFAULT();
-    //     if ((ret = esp_bt_controller_init(&bt_cfg)) != ESP_OK) {
-    //         ESP_LOGE(SPP_TAG, "%s initialize controller failed: %s\n", __func__, esp_err_to_name(ret));
-    //         return;
-    //     }
-
-    //     if ((ret = esp_bt_controller_enable(ESP_BT_MODE_CLASSIC_BT)) != ESP_OK) {
-    //         ESP_LOGE(SPP_TAG, "%s enable controller failed: %s\n", __func__, esp_err_to_name(ret));
-    //         return;
-    //     }
-
-    //     if ((ret = esp_bluedroid_init()) != ESP_OK) {
-    //         ESP_LOGE(SPP_TAG, "%s initialize bluedroid failed: %s\n", __func__, esp_err_to_name(ret));
-    //         return;
-    //     }
-
-    //     if ((ret = esp_bluedroid_enable()) != ESP_OK) {
-    //         ESP_LOGE(SPP_TAG, "%s enable bluedroid failed: %s\n", __func__, esp_err_to_name(ret));
-    //         return;
-    //     }
-
-    //     if ((ret = esp_bt_gap_register_callback(esp_bt_gap_cb)) != ESP_OK) {
-    //         ESP_LOGE(SPP_TAG, "%s gap register failed: %s\n", __func__, esp_err_to_name(ret));
-    //         return;
-    //     }
-
-    //     if ((ret = esp_spp_register_callback(esp_spp_cb)) != ESP_OK) {
-    //         ESP_LOGE(SPP_TAG, "%s spp register failed: %s\n", __func__, esp_err_to_name(ret));
-    //         return;
-    //     }
-
-    //     if ((ret = esp_spp_init(esp_spp_mode)) != ESP_OK) {
-    //         ESP_LOGE(SPP_TAG, "%s spp init failed: %s\n", __func__, esp_err_to_name(ret));
-    //         return;
-    //     }
-
-    // #if (CONFIG_BT_SSP_ENABLED == true)
-    //     /* Set default parameters for Secure Simple Pairing */
-    //     esp_bt_sp_param_t param_type = ESP_BT_SP_IOCAP_MODE;
-    //     esp_bt_io_cap_t iocap = ESP_BT_IO_CAP_IO;
-    //     esp_bt_gap_set_security_param(param_type, &iocap, sizeof(uint8_t));
-    // #endif
-
-    //     /*
-    //      * Set default parameters for Legacy Pairing
-    //      * Use variable pin, input pin code when pairing
-    //      */
-    //     esp_bt_pin_type_t pin_type = ESP_BT_PIN_TYPE_VARIABLE;
-    //     esp_bt_pin_code_t pin_code;
-    //     esp_bt_gap_set_pin(pin_type, 0, pin_code);
-
-    //     ESP_LOGI(SPP_TAG, "Own address:[%s]", bda2str((uint8_t *)esp_bt_dev_get_address(), bda_str, sizeof(bda_str)));
-
-    //     spp_task_task_start_up();
-
     //     // uint8_t data[] = {"{A1:2:3:4}$"};
     //     // while(1)
     //     // {
@@ -300,4 +325,13 @@ void app_main(void)
     //     //         esp_spp_write(bt_handle, strlen((char *)data), data);
     //     //     }
     //     // }
+    bt_spp_on();
+
+    pow_init();
+    uart_init();
+    // Allow other core to finish initialization
+    vTaskDelay(pdMS_TO_TICKS(100));
+
+    xTaskCreatePinnedToCore(uart_rx_task, "uart_rx_task", 4096, NULL, configMAX_PRIORITIES, NULL, tskNO_AFFINITY);
+    xTaskCreatePinnedToCore(uart_tx_task, "uart_tx_task", 4096, NULL, configMAX_PRIORITIES - 1, NULL, tskNO_AFFINITY);
 }
