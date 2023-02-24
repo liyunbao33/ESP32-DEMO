@@ -23,6 +23,7 @@
 #include "esp_log.h"
 #include "spp_task.h"
 
+
 static void spp_task_task_handler(spp_task_free_cb_t arg);
 static bool spp_task_send_msg(spp_task_msg_t *msg);
 static void spp_task_work_dispatched(spp_task_msg_t *msg);

@@ -11,7 +11,7 @@
 
 #include "driver/gpio.h"
 
-#define POW_GPIO 4
+#define POW_GPIO GPIO_NUM_4
 
 void pow_init(void)
 {

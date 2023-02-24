@@ -29,6 +29,8 @@
 #include "protocol.h"
 #include "uart.h"
 
+#include "esp_event.h"
+
 #define SPP_TAG "SPP_ACCEPTOR_DEMO"
 #define SPP_SERVER_NAME "SPP_SERVER"
 #define EXAMPLE_DEVICE_NAME "BALANCE_SPP"
