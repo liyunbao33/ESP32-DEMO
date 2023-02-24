@@ -39,7 +39,3 @@ void my_event_loop_delete(void)
 {
 
 }
-
-
-
-esp_event_base_t

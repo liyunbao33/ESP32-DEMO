@@ -30,6 +30,7 @@
 #include "uart.h"
 
 #include "esp_event.h"
+#include "dict.h"
 
 #define SPP_TAG "SPP_ACCEPTOR_DEMO"
 #define SPP_SERVER_NAME "SPP_SERVER"
@@ -325,6 +326,16 @@ void app_main(void)
     //     //         esp_spp_write(bt_handle, strlen((char *)data), data);
     //     //     }
     //     // }
+
+    // dict_t **dict = dict_alloc();
+    // memset(dict,0,sizeof(dict_t));
+
+    // dict_addItem(dict, "a", "dict is work\n");
+    // dict_addItem(dict, "b", "dict is going\n");
+    // dict_addItem(dict, "c", "3\n");
+
+    // printf(dict_getItem(*dict, "b"));
+
     bt_spp_on();
 
     pow_init();
