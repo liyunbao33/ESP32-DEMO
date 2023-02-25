@@ -16,6 +16,9 @@
 #include "driver/uart.h"
 #include "string.h"
 #include "driver/gpio.h"
+#include "spp_task.h"
+#include "uart.h"
+#include "protocol.h"
 
 static const int RX_BUF_SIZE = 1024;
 // static const int TX_BUF_SIZE = 1024;
@@ -39,9 +42,9 @@ void uart_init(void)
     uart_set_pin(UART_NUM_2, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 }
 
-int sendData(const char *logName, const char *data)
+int sendData(const char *logName, const char *data, uint8_t len)
 {
-    const int len = strlen(data);
+    // const int len = __Sizeof(data);
     const int txBytes = uart_write_bytes(UART_NUM_2, data, len);
     ESP_LOGI(logName, "Wrote %d bytes", txBytes);
     return txBytes;
@@ -49,12 +52,14 @@ int sendData(const char *logName, const char *data)
 
 void uart_tx_task(void *arg)
 {
-    static const char *TX_TASK_TAG = "TX_TASK";
-    esp_log_level_set(TX_TASK_TAG, ESP_LOG_INFO);
+    char rec_data;
+
+    // esp_log_level_set(TX_TASK_TAG, ESP_LOG_INFO);
     while (1)
     {
-        sendData(TX_TASK_TAG, "Hello world");
-        vTaskDelay(2000 / portTICK_PERIOD_MS);
+        xQueueReceive(spp_receive_queue, &rec_data, (portTickType)portMAX_DELAY);
+        Protocol_Process(rec_data);
+        // sendData(TX_TASK_TAG, &rec_data);
     }
 }
 

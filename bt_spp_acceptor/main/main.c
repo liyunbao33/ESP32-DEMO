@@ -343,6 +343,17 @@ void app_main(void)
     // Allow other core to finish initialization
     vTaskDelay(pdMS_TO_TICKS(100));
 
+        // uint8_t data[] = {"{A1:2:3:4}$"};
+        // while(1)
+        // {
+        //     vTaskDelay(30/portTICK_PERIOD_MS);
+        //     if(bt_handle != 0)
+        //     {
+        //         esp_spp_write(bt_handle, strlen((char *)data), data);
+        //     }
+        // }
+
     xTaskCreatePinnedToCore(uart_rx_task, "uart_rx_task", 4096, NULL, configMAX_PRIORITIES, NULL, tskNO_AFFINITY);
     xTaskCreatePinnedToCore(uart_tx_task, "uart_tx_task", 4096, NULL, configMAX_PRIORITIES - 1, NULL, tskNO_AFFINITY);
+
 }

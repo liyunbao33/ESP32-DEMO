@@ -19,6 +19,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include "esp_spp_api.h"
+#include "freertos/queue.h"
 
 #define SPP_TASK_TAG                   "SPP_TASK"
 
@@ -54,6 +55,7 @@ void spp_task_task_start_up(void);
  
 void spp_task_task_shut_down(void);
 
+extern xQueueHandle spp_receive_queue;
 
 // /**
 //  * @brief     handler for write and read

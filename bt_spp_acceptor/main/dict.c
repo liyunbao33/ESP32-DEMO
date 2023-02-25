@@ -9,6 +9,7 @@
  *
  */
 #include "dict.h"
+#include "stdlib.h"
 #include <string.h>
 
 dict_t **dict_alloc(void)

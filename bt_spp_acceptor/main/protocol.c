@@ -10,11 +10,12 @@
  */
 #include "protocol.h"
 #include <string.h>
+#include "uart.h"
 
 
 Frame_Union_TypeDef frame;
 uint8_t dataBackup[PROTOCOL_NUM_MAX];
-uint8_t nrfTxdBuf[5 + PROTOCOL_NUM_MAX];
+uint8_t txdBuf[5 + PROTOCOL_NUM_MAX];
 
 void protocol_init(void)
 {
@@ -22,74 +23,27 @@ void protocol_init(void)
     memset(frame.Data, 0, PROTOCOL_NUM_MAX);
 }
 
-void Protocol_Process(void)
+void Protocol_Process(uint8_t data)
 {
-    // if (KEY_Query(KEY_GROUP_UP))
-    // {
-    //     frame.dat.joyStick = FORWARD;
-    // }
-    // else if (KEY_Query(KEY_UP_RIGHT_DOWN))
-    // {
-    //     frame.dat.joyStick = RIGHT_FORWARD;
-    // }
-    // else if (KEY_Query(KEY_DOWN_RIGHT_DOWN))
-    // {
-    //     frame.dat.joyStick = RIGHT_BACKWARD;
-    // }
-    // else if (KEY_Query(KEY_UP_LEFT_DOWN))
-    // {
-    //     frame.dat.joyStick = LEFT_FORWARD;
-    // }
-    // else if (KEY_Query(KEY_DOWN_LEFT_DOWN))
-    // {
-    //     frame.dat.joyStick = LEFT_BACKWARD;
-    // }
-    // else if (KEY_Query(KEY_GROUP_DOWN))
-    // {
-    //     frame.dat.joyStick = BACKWARD;
-    // }
-    // else if (KEY_Query(KEY_GROUP_LEFT))
-    // {
-    //     frame.dat.joyStick = LEFT_ROTATION;
-    // }
-    // else if (KEY_Query(KEY_GROUP_RIGHT))
-    // {
-    //     frame.dat.joyStick = RIGHT_ROTATION;
-    // }
+    frame.dat.remoteControl = data;
 
-    // if (KEY_Query(KEY_SPEED_UP_DOWN))
-    // {
-    //     frame.dat.speed = SPEED_UP;
-    // }
-    // else if (KEY_Query(KEY_SPEED_DOWN_DOWN))
-    // {
-    //     frame.dat.speed = SPEED_DOWN;
-    // }
-
-    // if (KEY_Query(KEY_BRAKE))
-    // {
-    //     frame.dat.brake = BRAKE;
-    // }
-
-    // printf("cmp is %bd\n", memcmp(dataBackup, frame.Data, PROTOCOL_NUM_MAX));
+    // printf("cmp is %d\n", memcmp(dataBackup, frame.Data, PROTOCOL_NUM_MAX));
 
     if (memcmp(dataBackup, frame.Data, PROTOCOL_NUM_MAX) != 0)
     {
-        nrfTxdBuf[0] = 0x3C;
-        nrfTxdBuf[1] = 0xA1;
-        nrfTxdBuf[2] = PROTOCOL_NUM_MAX;
-        memcpy(&nrfTxdBuf[3], frame.Data, PROTOCOL_NUM_MAX);
-        nrfTxdBuf[3 + PROTOCOL_NUM_MAX] = 0x00;
+        txdBuf[0] = 0x3C;
+        txdBuf[1] = 0xA1;
+        txdBuf[2] = PROTOCOL_NUM_MAX;
+        memcpy(&txdBuf[3], frame.Data, PROTOCOL_NUM_MAX);
+        txdBuf[3 + PROTOCOL_NUM_MAX] = 0x00;
         for (uint8_t i = 0; i < (3 + PROTOCOL_NUM_MAX); i++) // 计算校验和
         {
-            nrfTxdBuf[3 + PROTOCOL_NUM_MAX] += nrfTxdBuf[i];
+            txdBuf[3 + PROTOCOL_NUM_MAX] += txdBuf[i];
         }
-        nrfTxdBuf[4 + PROTOCOL_NUM_MAX] = 0x0D;
+        txdBuf[4 + PROTOCOL_NUM_MAX] = 0x0D;
 
-        // __ValueMonitor(nrfTxdBuf[3 + PROTOCOL_NUM_MAX], Blink(2, 5, 5));
-
-        // NRF24L01_Transmit(nrfTxdBuf, 5, )5;/
-        // NRF24L01_TxPacket(nrfTxdBuf, (5 + PROTOCOL_NUM_MAX));
+        // NRF24L01_TxPacket(txdBuf, (5 + PROTOCOL_NUM_MAX));
+        sendData("TX_SEND", (char *)txdBuf, (5 + PROTOCOL_NUM_MAX));
         memset(frame.Data, 0, PROTOCOL_NUM_MAX);
     }
 }

@@ -19,9 +19,7 @@ do{\
 
 typedef struct
 {
-    unsigned char speed;
-    unsigned char joyStick;
-    unsigned char brake;
+    unsigned char remoteControl;
 } Frame_Struct_TypeDef;
 
 typedef union
@@ -29,17 +27,6 @@ typedef union
     Frame_Struct_TypeDef dat;
     unsigned char Data[PROTOCOL_NUM_MAX];
 } Frame_Union_TypeDef;
-
-enum 
-{
-    SPEED_UP = 'X',
-    SPEED_DOWN = 'Y',
-};
-
-enum
-{
-    BRAKE = 'Z',
-};
 
 enum
 {
@@ -51,12 +38,15 @@ enum
     LEFT_BACKWARD = 'F',
     LEFT_ROTATION = 'G',
     LEFT_FORWARD = 'H',
+    BRAKE = 'Z',
+    SPEED_UP = 'X',
+    SPEED_DOWN = 'Y',
 };
 
 extern Frame_Union_TypeDef frame;
 
 void protocol_init(void);
-void Protocol_Process(void);
+void Protocol_Process(uint8_t data);
 
 #endif
 

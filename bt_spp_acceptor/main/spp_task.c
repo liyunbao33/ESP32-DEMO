@@ -18,7 +18,6 @@
 #include "freertos/xtensa_api.h"
 #include "freertos/FreeRTOSConfig.h"
 #include "freertos/FreeRTOS.h"
-#include "freertos/queue.h"
 #include "freertos/task.h"
 #include "esp_log.h"
 #include "spp_task.h"
@@ -28,10 +27,11 @@ static void spp_task_task_handler(spp_task_free_cb_t arg);
 static bool spp_task_send_msg(spp_task_msg_t *msg);
 static void spp_task_work_dispatched(spp_task_msg_t *msg);
 
+xQueueHandle spp_receive_queue = NULL;
 static xQueueHandle spp_task_task_queue = NULL;
 static xTaskHandle spp_task_task_handle = NULL;
 
-static uint8_t data[] = {"{A1:2:3:4}$"};
+static uint8_t data[] = {"{C100:200:300:400:500:600:600:800:900}$"};
 
 bool spp_task_work_dispatch(spp_task_cb_t p_cback, uint16_t event, void *p_params, int param_len, spp_task_copy_cb_t p_copy_cback)
 {
@@ -68,8 +68,9 @@ void spp_task_wr_cb(uint16_t event, esp_spp_cb_param_t *param)
                 param->data_ind.len, param->data_ind.handle);
         if (param->data_ind.len < 128) {
             esp_log_buffer_hex("", param->data_ind.data, param->data_ind.len);
+            xQueueSend(spp_receive_queue, param->data_ind.data, 10 / portTICK_RATE_MS);
         }
-        printf("     esp_get_free_heap_size : %d  \n", esp_get_free_heap_size());
+        // printf("     esp_get_free_heap_size : %d  \n", esp_get_free_heap_size());
         break;
     case ESP_SPP_WRITE_EVT:
         esp_spp_write(param->write.handle, strlen((char *)data), data);
@@ -142,6 +143,7 @@ static void spp_task_task_handler(spp_task_free_cb_t spp_task_free_cb)
 void spp_task_task_start_up(void)
 {
     spp_task_task_queue = xQueueCreate(10, sizeof(spp_task_msg_t));
+    spp_receive_queue = xQueueCreate(50 ,sizeof(uint8_t));
     xTaskCreate(spp_task_task_handler, "SPPAppT", 4096, spp_task_free_cb, 10, &spp_task_task_handle);
     return;
 }
