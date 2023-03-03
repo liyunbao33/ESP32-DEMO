@@ -14,6 +14,7 @@
 
 
 FrameA1_Union_TypeDef frameA1;
+FrameA2_Union_TypeDef frameA2;
 uint8_t dataBackup[PROTOCOLA1_NUM_MAX];
 uint8_t txdBuf[5 + PROTOCOLA1_NUM_MAX];
 

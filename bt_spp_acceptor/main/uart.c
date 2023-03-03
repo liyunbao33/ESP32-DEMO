@@ -68,6 +68,7 @@ void uart_tx_task(void *arg)
 void uart_rx_task(void *arg)
 {
     uart_event_t event;
+    uint8_t temp_sum = 0;
 
     static const char *RX_TASK_TAG = "RX_TASK";
     esp_log_level_set(RX_TASK_TAG, ESP_LOG_INFO);
@@ -91,6 +92,20 @@ void uart_rx_task(void *arg)
                     data[rxBytes] = 0;
                     ESP_LOGI(RX_TASK_TAG, "Read %d bytes: '%s'", rxBytes, data);
                     ESP_LOG_BUFFER_HEXDUMP(RX_TASK_TAG, data, rxBytes, ESP_LOG_INFO);
+                }
+
+                temp_sum = (data[0] + data[1] + data[2]);
+
+                for (uint8_t i = 0; i < data[2]; i++)
+                {
+                    temp_sum += data[3 + i];
+                }
+                if (data[0] == 0x3C && data[1] == 0xA2 && temp_sum == data[3 + data[2]] && data[4 + data[2]] == 0x0D)
+                {
+                    for (uint8_t i = 0; i < data[2]; i++)
+                    {
+                        frameA2.unionData[i] = data[3 + i];
+                    }
                 }
                 break;
             default:
