@@ -143,7 +143,6 @@ static void spp_task_task_handler(spp_task_free_cb_t spp_task_free_cb)
 void spp_task_task_start_up(void)
 {
     spp_task_task_queue = xQueueCreate(10, sizeof(spp_task_msg_t));
-    spp_receive_queue = xQueueCreate(50 ,sizeof(uint8_t));
     xTaskCreate(spp_task_task_handler, "SPPAppT", 4096, spp_task_free_cb, 10, &spp_task_task_handle);
     return;
 }

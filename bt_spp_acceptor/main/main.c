@@ -234,16 +234,10 @@ void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *param)
     return;
 }
 
-static void bt_spp_on(void)
+void bt_spp_on(void)
 {
     char bda_str[18] = {0};
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
-    {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
+    esp_err_t ret;
 
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_BLE));
 
@@ -317,6 +311,14 @@ static void bt_spp_off(void)
 
 void app_main(void)
 {
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
+    {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
+
     //     // uint8_t data[] = {"{A1:2:3:4}$"};
     //     // while(1)
     //     // {
@@ -343,17 +345,16 @@ void app_main(void)
     // Allow other core to finish initialization
     vTaskDelay(pdMS_TO_TICKS(100));
 
-        // uint8_t data[] = {"{A1:2:3:4}$"};
-        // while(1)
-        // {
-        //     vTaskDelay(30/portTICK_PERIOD_MS);
-        //     if(bt_handle != 0)
-        //     {
-        //         esp_spp_write(bt_handle, strlen((char *)data), data);
-        //     }
-        // }
+    // uint8_t data[] = {"{A1:2:3:4}$"};
+    // while(1)
+    // {
+    //     vTaskDelay(30/portTICK_PERIOD_MS);
+    //     if(bt_handle != 0)
+    //     {
+    //         esp_spp_write(bt_handle, strlen((char *)data), data);
+    //     }
+    // }
 
-    xTaskCreatePinnedToCore(uart_rx_task, "uart_rx_task", 4096, NULL, configMAX_PRIORITIES, NULL, tskNO_AFFINITY);
-    xTaskCreatePinnedToCore(uart_tx_task, "uart_tx_task", 4096, NULL, configMAX_PRIORITIES - 1, NULL, tskNO_AFFINITY);
-
+    // xTaskCreatePinnedToCore(uart_rx_task, "uart_rx_task", 4096, NULL, configMAX_PRIORITIES - 1, NULL, tskNO_AFFINITY);
+    xTaskCreatePinnedToCore(uart_tx_task, "uart_tx_task", 4096, NULL, configMAX_PRIORITIES, NULL, tskNO_AFFINITY);
 }

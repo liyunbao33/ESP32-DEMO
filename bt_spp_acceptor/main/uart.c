@@ -19,6 +19,7 @@
 #include "spp_task.h"
 #include "uart.h"
 #include "protocol.h"
+#include "main.h"
 
 static const int RX_BUF_SIZE = 1024;
 // static const int TX_BUF_SIZE = 1024;
@@ -42,6 +43,8 @@ void uart_init(void)
     uart_driver_install(UART_NUM_2, RX_BUF_SIZE * 2, 0, 20, &uart2_queue, 0);
     uart_param_config(UART_NUM_2, &uart_config);
     uart_set_pin(UART_NUM_2, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
+
+    spp_receive_queue = xQueueCreate(50 ,sizeof(uint8_t));
 }
 
 int sendData(const char *logName, const char *data, uint8_t len)
@@ -90,8 +93,8 @@ void uart_rx_task(void *arg)
                 if (rxBytes > 0)
                 {
                     data[rxBytes] = 0;
-                    ESP_LOGI(RX_TASK_TAG, "Read %d bytes: '%s'", rxBytes, data);
-                    ESP_LOG_BUFFER_HEXDUMP(RX_TASK_TAG, data, rxBytes, ESP_LOG_INFO);
+                    // ESP_LOGI(RX_TASK_TAG, "Read %d bytes: '%s'", rxBytes, data);
+                    // ESP_LOG_BUFFER_HEXDUMP(RX_TASK_TAG, data, rxBytes, ESP_LOG_INFO);
                 }
 
                 temp_sum = (data[0] + data[1] + data[2]);
@@ -106,6 +109,12 @@ void uart_rx_task(void *arg)
                     {
                         frameA2.unionData[i] = data[3 + i];
                     }
+                }
+
+                if(frameA2.data.internetSelect == BLUETOOH)
+                {
+                    // printf("bluetooh is on\n");
+                    __ExecuteOnce(bt_spp_on());
                 }
                 break;
             default:
