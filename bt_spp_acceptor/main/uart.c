@@ -23,6 +23,8 @@
 static const int RX_BUF_SIZE = 1024;
 // static const int TX_BUF_SIZE = 1024;
 
+static QueueHandle_t uart2_queue;
+
 #define TXD_PIN (GPIO_NUM_17)
 #define RXD_PIN (GPIO_NUM_16)
 
@@ -37,7 +39,7 @@ void uart_init(void)
         .source_clk = UART_SCLK_APB,
     };
     // We won't use a buffer for sending data.
-    uart_driver_install(UART_NUM_2, RX_BUF_SIZE * 2, 0, 0, NULL, 0);
+    uart_driver_install(UART_NUM_2, RX_BUF_SIZE * 2, 0, 20, &uart2_queue, 0);
     uart_param_config(UART_NUM_2, &uart_config);
     uart_set_pin(UART_NUM_2, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 }
@@ -65,18 +67,44 @@ void uart_tx_task(void *arg)
 
 void uart_rx_task(void *arg)
 {
+    uart_event_t event;
+
     static const char *RX_TASK_TAG = "RX_TASK";
     esp_log_level_set(RX_TASK_TAG, ESP_LOG_INFO);
     uint8_t *data = (uint8_t *)malloc(RX_BUF_SIZE + 1);
     while (1)
     {
-        const int rxBytes = uart_read_bytes(UART_NUM_2, data, RX_BUF_SIZE, 1000 / portTICK_PERIOD_MS);
-        if (rxBytes > 0)
+
+        int rxBytes;
+        if (xQueueReceive(uart2_queue, (void *)&event, (TickType_t)portMAX_DELAY))
         {
-            data[rxBytes] = 0;
-            ESP_LOGI(RX_TASK_TAG, "Read %d bytes: '%s'", rxBytes, data);
-            ESP_LOG_BUFFER_HEXDUMP(RX_TASK_TAG, data, rxBytes, ESP_LOG_INFO);
+            switch (event.type)
+            {
+            // Event of UART receving data
+            /*We'd better handler data event fast, there would be much more data events than
+            other types of events. If we take too much time on data event, the queue might
+            be full.*/
+            case UART_DATA:
+                rxBytes = uart_read_bytes(UART_NUM_2, data, event.size, portMAX_DELAY);
+                if (rxBytes > 0)
+                {
+                    data[rxBytes] = 0;
+                    ESP_LOGI(RX_TASK_TAG, "Read %d bytes: '%s'", rxBytes, data);
+                    ESP_LOG_BUFFER_HEXDUMP(RX_TASK_TAG, data, rxBytes, ESP_LOG_INFO);
+                }
+                break;
+            default:
+                break;
+            }
         }
+
+        // const int rxBytes = uart_read_bytes(UART_NUM_2, data, RX_BUF_SIZE, 1000 / portTICK_PERIOD_MS);
+        // if (rxBytes > 0)
+        // {
+        //     data[rxBytes] = 0;
+        //     ESP_LOGI(RX_TASK_TAG, "Read %d bytes: '%s'", rxBytes, data);
+        //     ESP_LOG_BUFFER_HEXDUMP(RX_TASK_TAG, data, rxBytes, ESP_LOG_INFO);
+        // }
     }
     free(data);
 }

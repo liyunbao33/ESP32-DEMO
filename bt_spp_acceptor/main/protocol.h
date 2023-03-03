@@ -15,18 +15,18 @@ do{\
     if(last!=(now))func,last=(now);\
 }while(0)
 
-#define PROTOCOL_NUM_MAX (sizeof(Frame_Struct_TypeDef)/sizeof(uint8_t))
+#define PROTOCOLA1_NUM_MAX (sizeof(FrameA1_Struct_TypeDef)/sizeof(uint8_t))
 
 typedef struct
 {
     unsigned char remoteControl;
-} Frame_Struct_TypeDef;
+} FrameA1_Struct_TypeDef;
 
 typedef union
 {
-    Frame_Struct_TypeDef dat;
-    unsigned char Data[PROTOCOL_NUM_MAX];
-} Frame_Union_TypeDef;
+    FrameA1_Struct_TypeDef dat;
+    unsigned char Data[PROTOCOLA1_NUM_MAX];
+} FrameA1_Union_TypeDef;
 
 enum
 {
@@ -43,7 +43,7 @@ enum
     SPEED_DOWN = 'Y',
 };
 
-extern Frame_Union_TypeDef frame;
+extern FrameA1_Union_TypeDef frame;
 
 void protocol_init(void);
 void Protocol_Process(uint8_t data);
