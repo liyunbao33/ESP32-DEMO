@@ -45,3 +45,6 @@ udp_client/.vscode
 
 smart_config/build
 smart_config/.vscode
+
+udp_server/build
+udp_server/.vscode
