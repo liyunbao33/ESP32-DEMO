@@ -39,7 +39,7 @@ typedef struct
 typedef union
 {
     FrameA2_Struct_TypeDef data;
-    uint8_t unionData[PROTOCOLA2_NUM_MAX];
+    unsigned char Data[PROTOCOLA2_NUM_MAX];
 } FrameA2_Union_TypeDef;
 
 enum
@@ -68,6 +68,7 @@ extern FrameA1_Union_TypeDef frameA1;
 extern FrameA2_Union_TypeDef frameA2;
 
 void protocol_init(void);
-void Protocol_Process(uint8_t data);
+void Protocol_Send(uint8_t funCode ,uint8_t *data);
+void Protocol_Receive(uint8_t *data);
 
 #endif

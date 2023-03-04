@@ -21,28 +21,35 @@
 #include "esp_spp_api.h"
 #include "freertos/queue.h"
 
-#define SPP_TASK_TAG                   "SPP_TASK"
+#define SPP_TASK_TAG "SPP_TASK"
 
-#define SPP_TASK_SIG_WORK_DISPATCH          (0x01)
+#define SPP_TASK_SIG_WORK_DISPATCH (0x01)
 
 /**
  * @brief     handler for the dispatched work
  */
-typedef void (* spp_task_cb_t) (uint16_t event, esp_spp_cb_param_t *param);
+typedef void (*spp_task_cb_t)(uint16_t event, esp_spp_cb_param_t *param);
 
 /* message to be sent */
-typedef struct {
-    uint16_t             sig;      /*!< signal to spp_task_task */
-    uint16_t             event;    /*!< message event id */
-    spp_task_cb_t        cb;       /*!< context switch callback */
-    void                 *param;   /*!< parameter area needs to be last */
+typedef struct
+{
+    uint16_t sig;     /*!< signal to spp_task_task */
+    uint16_t event;   /*!< message event id */
+    spp_task_cb_t cb; /*!< context switch callback */
+    void *param;      /*!< parameter area needs to be last */
 } spp_task_msg_t;
+
+typedef struct
+{
+    uint8_t funCode;
+    uint8_t *buff;
+} spp_queue_data_t;
 
 // /**
 //  * @brief     parameter deep-copy function to be customized
 //  */
-typedef void (* spp_task_copy_cb_t) (spp_task_msg_t *msg, esp_spp_cb_param_t *p_dest, esp_spp_cb_param_t *p_src);
-typedef void (* spp_task_free_cb_t) (spp_task_msg_t *msg, esp_spp_cb_param_t *p_dest);
+typedef void (*spp_task_copy_cb_t)(spp_task_msg_t *msg, esp_spp_cb_param_t *p_dest, esp_spp_cb_param_t *p_src);
+typedef void (*spp_task_free_cb_t)(spp_task_msg_t *msg, esp_spp_cb_param_t *p_dest);
 /**
  * @brief     work dispatcher for the application task
  */
@@ -52,7 +59,7 @@ void spp_task_copy_cb(spp_task_msg_t *msg, esp_spp_cb_param_t *p_dest, esp_spp_c
 void spp_task_free_cb(spp_task_msg_t *msg, esp_spp_cb_param_t *p_dest);
 
 void spp_task_task_start_up(void);
- 
+
 void spp_task_task_shut_down(void);
 
 extern xQueueHandle spp_receive_queue;

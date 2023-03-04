@@ -44,7 +44,7 @@ void uart_init(void)
     uart_param_config(UART_NUM_2, &uart_config);
     uart_set_pin(UART_NUM_2, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 
-    spp_receive_queue = xQueueCreate(50 ,sizeof(uint8_t));
+    spp_receive_queue = xQueueCreate(50 ,sizeof(spp_queue_data_t));
 }
 
 int sendData(const char *logName, const char *data, uint8_t len)
@@ -57,14 +57,13 @@ int sendData(const char *logName, const char *data, uint8_t len)
 
 void uart_tx_task(void *arg)
 {
-    char rec_data;
+    spp_queue_data_t rec_data;
 
     // esp_log_level_set(TX_TASK_TAG, ESP_LOG_INFO);
     while (1)
     {
         xQueueReceive(spp_receive_queue, &rec_data, (portTickType)portMAX_DELAY);
-        Protocol_Process(rec_data);
-        // sendData(TX_TASK_TAG, &rec_data);
+        Protocol_Send(rec_data.funCode, rec_data.buff);
     }
 }
 
@@ -97,25 +96,25 @@ void uart_rx_task(void *arg)
                     // ESP_LOG_BUFFER_HEXDUMP(RX_TASK_TAG, data, rxBytes, ESP_LOG_INFO);
                 }
 
-                temp_sum = (data[0] + data[1] + data[2]);
+                // temp_sum = (data[0] + data[1] + data[2]);
 
-                for (uint8_t i = 0; i < data[2]; i++)
-                {
-                    temp_sum += data[3 + i];
-                }
-                if (data[0] == 0x3C && data[1] == 0xA2 && temp_sum == data[3 + data[2]] && data[4 + data[2]] == 0x0D)
-                {
-                    for (uint8_t i = 0; i < data[2]; i++)
-                    {
-                        frameA2.unionData[i] = data[3 + i];
-                    }
-                }
+                // for (uint8_t i = 0; i < data[2]; i++)
+                // {
+                //     temp_sum += data[3 + i];
+                // }
+                // if (data[0] == 0x3C && data[1] == 0xA2 && temp_sum == data[3 + data[2]] && data[4 + data[2]] == 0x0D)
+                // {
+                //     for (uint8_t i = 0; i < data[2]; i++)
+                //     {
+                //         frameA2.unionData[i] = data[3 + i];
+                //     }
+                // }
 
-                if(frameA2.data.internetSelect == BLUETOOH)
-                {
-                    // printf("bluetooh is on\n");
-                    __ExecuteOnce(bt_spp_on());
-                }
+                // if(frameA2.data.internetSelect == BLUETOOH)
+                // {
+                //     // printf("bluetooh is on\n");
+                //     __ExecuteOnce(bt_spp_on());
+                // }
                 break;
             default:
                 break;

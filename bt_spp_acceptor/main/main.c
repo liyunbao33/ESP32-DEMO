@@ -352,9 +352,9 @@ void app_main(void)
     //     if(bt_handle != 0)
     //     {
     //         esp_spp_write(bt_handle, strlen((char *)data), data);
-    //     }
+    //     } 
     // }
 
-    // xTaskCreatePinnedToCore(uart_rx_task, "uart_rx_task", 4096, NULL, configMAX_PRIORITIES - 1, NULL, tskNO_AFFINITY);
-    xTaskCreatePinnedToCore(uart_tx_task, "uart_tx_task", 4096, NULL, configMAX_PRIORITIES, NULL, tskNO_AFFINITY);
+    xTaskCreatePinnedToCore(uart_rx_task, "uart_rx_task", 4096, NULL, configMAX_PRIORITIES, NULL, tskNO_AFFINITY);
+    xTaskCreatePinnedToCore(uart_tx_task, "uart_tx_task", 4096, NULL, configMAX_PRIORITIES - 1, NULL, tskNO_AFFINITY);
 }
