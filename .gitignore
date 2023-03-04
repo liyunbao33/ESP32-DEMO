@@ -48,3 +48,6 @@ smart_config/.vscode
 
 udp_server/build
 udp_server/.vscode
+
+sntp/build
+sntp/.vscode
