@@ -51,3 +51,6 @@ udp_server/.vscode
 
 sntp/build
 sntp/.vscode
+
+tcp/build
+tcp/.vscode
