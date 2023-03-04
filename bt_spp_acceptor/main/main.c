@@ -236,8 +236,25 @@ void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *param)
 
 void bt_spp_on(void)
 {
+    spp_task_task_start_up();
+}
+
+void bt_spp_off(void)
+{
+    spp_task_task_shut_down();
+}
+
+void app_main(void)
+{
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
+    {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
+
     char bda_str[18] = {0};
-    esp_err_t ret;
 
     ESP_ERROR_CHECK(esp_bt_controller_mem_release(ESP_BT_MODE_BLE));
 
@@ -300,24 +317,6 @@ void bt_spp_on(void)
     esp_bt_gap_set_pin(pin_type, 0, pin_code);
 
     ESP_LOGI(SPP_TAG, "Own address:[%s]", bda2str((uint8_t *)esp_bt_dev_get_address(), bda_str, sizeof(bda_str)));
-
-    spp_task_task_start_up();
-}
-
-static void bt_spp_off(void)
-{
-    ;
-}
-
-void app_main(void)
-{
-    esp_err_t ret = nvs_flash_init();
-    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
-    {
-        ESP_ERROR_CHECK(nvs_flash_erase());
-        ret = nvs_flash_init();
-    }
-    ESP_ERROR_CHECK(ret);
 
     //     // uint8_t data[] = {"{A1:2:3:4}$"};
     //     // while(1)

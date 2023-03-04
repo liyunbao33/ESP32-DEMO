@@ -17,6 +17,7 @@
 #include "freertos/semphr.h"
 #include "main.h"
 #include <stdio.h>
+#include "spp_task.h"
 
 FrameA1_Union_TypeDef frameA1;
 FrameA2_Union_TypeDef frameA2;
@@ -82,6 +83,7 @@ void Protocol_Send(uint8_t funCode, uint8_t *data)
 void Protocol_Receive(uint8_t *data)
 {
     uint8_t temp_sum = 0;
+    spp_queue_data_t tx_data;
 
     temp_sum = (data[0] + data[1] + data[2]);
 
@@ -105,6 +107,9 @@ void Protocol_Receive(uint8_t *data)
                 frameA2.Data[i] = data[3 + i];
             }
             __ValueMonitor(frameA2.data.internetSelect, xSemaphoreGive(protocol_semaphore));
+            // tx_data.funCode = 0xA2;
+            // tx_data.buff = &frameA2.data.internetSelect;
+            // xQueueSend(spp_receive_queue, &tx_data, 10 / portTICK_RATE_MS);
             break;
 
         default:
@@ -125,6 +130,8 @@ void protocol_task(void *arg)
             printf("bt_spp_on\n");
             break;
         default:
+            bt_spp_off();
+            printf("bt_spp_off\n");
             break;
         }
     }

@@ -14,6 +14,7 @@
 #include <stddef.h>
 
 void bt_spp_on(void);
+void bt_spp_off(void);
 
 /**
  * @brief  variable monitor，triggered when a variable changes
