@@ -42,3 +42,6 @@ user_event_loops/.vscode
 
 udp_client/build
 udp_client/.vscode
+
+smart_config/build
+smart_config/.vscode
