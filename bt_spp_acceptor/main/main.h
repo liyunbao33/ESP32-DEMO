@@ -16,6 +16,20 @@
 void bt_spp_on(void);
 
 /**
+ * @brief  variable monitor，triggered when a variable changes
+ * @param  now:variables to be monitored(int)
+ * @param  func:the event triggers the callback function(it could be an assignment or something else)
+ * @retval
+ */
+#define __ValueMonitor(now, func) \
+  do                              \
+  {                               \
+    static int last = 0;          \
+    if (last != (now))            \
+      func, last = (now);         \
+  } while (0)
+
+/**
   * @brief  Gets the number of elements in an array
   * @param  arr: Array name (any type)
   * @retval The number of elements in this array

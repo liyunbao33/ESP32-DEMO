@@ -338,8 +338,9 @@ void app_main(void)
 
     // printf(dict_getItem(*dict, "b"));
 
-    bt_spp_on();
+    // bt_spp_on();
 
+    Protocol_Init();
     pow_init();
     uart_init();
     // Allow other core to finish initialization
@@ -352,9 +353,10 @@ void app_main(void)
     //     if(bt_handle != 0)
     //     {
     //         esp_spp_write(bt_handle, strlen((char *)data), data);
-    //     } 
+    //     }
     // }
 
     xTaskCreatePinnedToCore(uart_rx_task, "uart_rx_task", 4096, NULL, configMAX_PRIORITIES, NULL, tskNO_AFFINITY);
     xTaskCreatePinnedToCore(uart_tx_task, "uart_tx_task", 4096, NULL, configMAX_PRIORITIES - 1, NULL, tskNO_AFFINITY);
+    xTaskCreatePinnedToCore(protocol_task, "protocol_task", 4096, NULL, configMAX_PRIORITIES - 2, NULL, tskNO_AFFINITY);
 }

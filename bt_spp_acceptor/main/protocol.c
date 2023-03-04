@@ -11,9 +11,17 @@
 #include "protocol.h"
 #include <string.h>
 #include "uart.h"
+#include "freertos/FreeRTOSConfig.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/task.h"
+#include "freertos/semphr.h"
+#include "main.h"
+#include <stdio.h>
 
 FrameA1_Union_TypeDef frameA1;
 FrameA2_Union_TypeDef frameA2;
+SemaphoreHandle_t protocol_semaphore;
+
 // uint8_t frameA1Backup[PROTOCOLA1_NUM_MAX];
 // uint8_t txdBuf[5 + PROTOCOLA1_NUM_MAX];
 
@@ -22,6 +30,11 @@ FrameA2_Union_TypeDef frameA2;
 //     memset(frameA1Backup, 0, PROTOCOLA1_NUM_MAX);
 //     memset(frameA1.Data, 0, PROTOCOLA1_NUM_MAX);
 // }
+
+void Protocol_Init(void)
+{
+    protocol_semaphore = xSemaphoreCreateBinary();
+}
 
 void Protocol_Send(uint8_t funCode, uint8_t *data)
 {
@@ -91,8 +104,26 @@ void Protocol_Receive(uint8_t *data)
             {
                 frameA2.Data[i] = data[3 + i];
             }
+            __ValueMonitor(frameA2.data.internetSelect, xSemaphoreGive(protocol_semaphore));
             break;
 
+        default:
+            break;
+        }
+    }
+}
+
+void protocol_task(void *arg)
+{
+    while (1)
+    {
+        xSemaphoreTake(protocol_semaphore, portMAX_DELAY);
+        switch (frameA2.data.internetSelect)
+        {
+        case BLUETOOH:
+            bt_spp_on();
+            printf("bt_spp_on\n");
+            break;
         default:
             break;
         }

@@ -67,8 +67,9 @@ enum
 extern FrameA1_Union_TypeDef frameA1;
 extern FrameA2_Union_TypeDef frameA2;
 
-void protocol_init(void);
 void Protocol_Send(uint8_t funCode ,uint8_t *data);
 void Protocol_Receive(uint8_t *data);
+void Protocol_Init(void);
+void protocol_task(void *arg);
 
 #endif
