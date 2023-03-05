@@ -40,6 +40,7 @@ static volatile uint8_t timeflag = 0;
 static volatile uint8_t mqttflag = 0;
 static volatile uint8_t mqttflag2 = 1;
 SemaphoreHandle_t sntpSemaphore;
+esp_mqtt_client_handle_t mqitt_client;
 void sntp_time_get_task(void);
 
 /* mqtt */
@@ -108,7 +109,7 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
     mqtt_event_handler_cb(event_data);
 }
 
-static void mqtt_app_start(void)
+void mqtt_app_start(void)
 {
     esp_mqtt_client_config_t mqtt_cfg = {
         .uri = "mqtt://mqtt.eclipseprojects.io",
@@ -138,9 +139,20 @@ static void mqtt_app_start(void)
     //     }
     // #endif /* CONFIG_BROKER_URL_FROM_STDIN */
 
-    esp_mqtt_client_handle_t client = esp_mqtt_client_init(&mqtt_cfg);
-    esp_mqtt_client_register_event(client, ESP_EVENT_ANY_ID, mqtt_event_handler, client);
-    esp_mqtt_client_start(client);
+    mqitt_client = esp_mqtt_client_init(&mqtt_cfg);
+    esp_mqtt_client_register_event(mqitt_client, ESP_EVENT_ANY_ID, mqtt_event_handler, mqitt_client);
+    esp_mqtt_client_start(mqitt_client);
+}
+
+void mqtt_app_stop(void)
+{
+    if (mqitt_client)
+    {
+        esp_mqtt_client_stop(mqitt_client);
+        // esp_mqtt_client_unregister_event(mqitt_client, ESP_EVENT_ANY_ID, mqtt_event_handler);
+        esp_mqtt_client_destroy(mqitt_client);
+    }
+    mqitt_client = NULL;
 }
 
 /* smart config */

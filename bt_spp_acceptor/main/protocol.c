@@ -18,6 +18,7 @@
 #include "main.h"
 #include <stdio.h>
 #include "spp_task.h"
+#include "wifi.h"
 
 FrameA1_Union_TypeDef frameA1;
 FrameA2_Union_TypeDef frameA2;
@@ -127,11 +128,18 @@ void protocol_task(void *arg)
         {
         case BLUETOOH:
             bt_spp_on();
+            mqtt_app_stop();
             printf("bt_spp_on\n");
+            break;
+        case WIFI:
+            bt_spp_off();
+            mqtt_app_start();
+            printf("mqtt_app_start\n");
             break;
         default:
             bt_spp_off();
-            printf("bt_spp_off\n");
+            mqtt_app_stop();
+            printf("bt_spp_off,mqtt_app_stop\n");
             break;
         }
     }
