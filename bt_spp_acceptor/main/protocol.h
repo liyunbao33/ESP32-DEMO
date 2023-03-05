@@ -38,7 +38,7 @@ typedef struct
 
 typedef union
 {
-    FrameA2_Struct_TypeDef data;
+    FrameA2_Struct_TypeDef dat;
     unsigned char Data[PROTOCOLA2_NUM_MAX];
 } FrameA2_Union_TypeDef;
 

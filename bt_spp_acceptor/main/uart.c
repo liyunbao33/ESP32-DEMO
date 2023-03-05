@@ -57,13 +57,14 @@ int sendData(const char *logName, const char *data, uint8_t len)
 
 void uart_tx_task(void *arg)
 {
-    spp_queue_data_t rec_data;
+    // spp_queue_data_t rec_data;
 
     // esp_log_level_set(TX_TASK_TAG, ESP_LOG_INFO);
     while (1)
     {
-        xQueueReceive(spp_receive_queue, &rec_data, (portTickType)portMAX_DELAY);
-        Protocol_Send(rec_data.funCode, rec_data.buff);
+        // xQueueReceive(spp_receive_queue, &rec_data, (portTickType)portMAX_DELAY);
+        Protocol_Send(0xA1, frameA1.Data);
+        vTaskDelay(100/portTICK_PERIOD_MS);
     }
 }
 

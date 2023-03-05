@@ -237,11 +237,13 @@ void esp_bt_gap_cb(esp_bt_gap_cb_event_t event, esp_bt_gap_cb_param_t *param)
 
 void bt_spp_on(void)
 {
+    esp_spp_init(esp_spp_mode);
     spp_task_task_start_up();
 }
 
 void bt_spp_off(void)
 {
+    esp_spp_deinit();
     spp_task_task_shut_down();
 }
 
@@ -341,7 +343,7 @@ void app_main(void)
 
     // printf(dict_getItem(*dict, "b"));
 
-    // bt_spp_on();
+    bt_spp_on();
 
     Protocol_Init();
     pow_init();
