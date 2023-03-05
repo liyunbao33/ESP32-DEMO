@@ -222,7 +222,7 @@ static void event_handler(void *arg, esp_event_base_t event_base,
     }
 }
 
-static void initialise_wifi(void)
+void initialise_wifi(void)
 {
     // ESP_ERROR_CHECK(esp_netif_init());
     s_wifi_event_group = xEventGroupCreate();
@@ -363,40 +363,40 @@ void get_time(void)
     // esp_deep_sleep(1000000LL * deep_sleep_sec);
 }
 
-void app_main(void)
-{
-    ESP_ERROR_CHECK(nvs_flash_init());
-    ESP_ERROR_CHECK(esp_netif_init());
-    ESP_ERROR_CHECK(esp_event_loop_create_default());
+// void app_main(void)
+// {
+//     ESP_ERROR_CHECK(nvs_flash_init());
+//     ESP_ERROR_CHECK(esp_netif_init());
+//     ESP_ERROR_CHECK(esp_event_loop_create_default());
 
-    /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
-     * Read "Establishing Wi-Fi or Ethernet Connection" section in
-     * examples/protocols/README.md for more information about this function.
-     */
-    // ESP_ERROR_CHECK(example_connect());
+//     /* This helper function configures Wi-Fi or Ethernet, as selected in menuconfig.
+//      * Read "Establishing Wi-Fi or Ethernet Connection" section in
+//      * examples/protocols/README.md for more information about this function.
+//      */
+//     // ESP_ERROR_CHECK(example_connect());
 
-    // initialize_sntp();
+//     // initialize_sntp();
 
-    initialise_wifi();
+//     initialise_wifi();
 
-    while (1)
-    {
-        if (mqttflag && mqttflag2)
-        {
-            mqttflag2 = 0;
-            mqttflag = 0;
-            mqtt_app_start();
-        }
+//     while (1)
+//     {
+//         if (mqttflag && mqttflag2)
+//         {
+//             mqttflag2 = 0;
+//             mqttflag = 0;
+//             mqtt_app_start();
+//         }
 
-        if (timeflag)
-        {
-            // timeflag = 0;
-            get_time();
-        }
+//         if (timeflag)
+//         {
+//             // timeflag = 0;
+//             get_time();
+//         }
 
-        vTaskDelay(5000 / portTICK_PERIOD_MS);
-    }
-}
+//         vTaskDelay(5000 / portTICK_PERIOD_MS);
+//     }
+// }
 
 static void obtain_time(void)
 {
@@ -439,3 +439,5 @@ static void initialize_sntp(void)
 #endif
     sntp_init();
 }
+
+

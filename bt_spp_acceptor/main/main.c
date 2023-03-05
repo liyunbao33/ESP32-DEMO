@@ -31,6 +31,7 @@
 
 #include "esp_event.h"
 #include "dict.h"
+#include "wifi.h"
 
 #define SPP_TAG "SPP_ACCEPTOR_DEMO"
 #define SPP_SERVER_NAME "SPP_SERVER"
@@ -253,6 +254,9 @@ void app_main(void)
         ret = nvs_flash_init();
     }
     ESP_ERROR_CHECK(ret);
+    ESP_ERROR_CHECK(esp_netif_init());
+    ESP_ERROR_CHECK(esp_event_loop_create_default());
+
 
     char bda_str[18] = {0};
 
@@ -344,6 +348,8 @@ void app_main(void)
     uart_init();
     // Allow other core to finish initialization
     vTaskDelay(pdMS_TO_TICKS(100));
+
+    initialise_wifi();
 
     // uint8_t data[] = {"{A1:2:3:4}$"};
     // while(1)
