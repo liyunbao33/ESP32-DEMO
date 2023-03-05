@@ -348,7 +348,7 @@ void app_main(void)
     uart_init();
     // Allow other core to finish initialization
     vTaskDelay(pdMS_TO_TICKS(100));
-
+    sntp_time_int();
     initialise_wifi();
 
     // uint8_t data[] = {"{A1:2:3:4}$"};
@@ -364,4 +364,5 @@ void app_main(void)
     xTaskCreatePinnedToCore(uart_rx_task, "uart_rx_task", 4096, NULL, configMAX_PRIORITIES, NULL, tskNO_AFFINITY);
     xTaskCreatePinnedToCore(uart_tx_task, "uart_tx_task", 4096, NULL, configMAX_PRIORITIES - 1, NULL, tskNO_AFFINITY);
     xTaskCreatePinnedToCore(protocol_task, "protocol_task", 4096, NULL, configMAX_PRIORITIES - 2, NULL, tskNO_AFFINITY);
+    xTaskCreatePinnedToCore(sntp_time_get_task, "sntp_time_get_task", 4096, NULL, 2, NULL, tskNO_AFFINITY);
 }
