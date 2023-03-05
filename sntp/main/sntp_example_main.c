@@ -38,6 +38,7 @@
 static const char *TAG = "example";
 static volatile uint8_t timeflag = 0;
 static volatile uint8_t mqttflag = 0;
+static volatile uint8_t mqttflag2 = 1;
 void get_time(void);
 
 /* mqtt */
@@ -254,7 +255,7 @@ static void smartconfig_example_task(void *parm)
             ESP_LOGI(TAG, "WiFi Connected to ap");
             // get_time();
             timeflag = 1;
-            mqttflag = 1;
+            // mqttflag = 1;
         }
         if (uxBits & ESPTOUCH_DONE_BIT)
         {
@@ -341,6 +342,7 @@ void get_time(void)
     localtime_r(&now, &timeinfo);
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
     ESP_LOGI(TAG, "The current date/time in Shanghai is: %s", strftime_buf);
+    mqttflag = 1;
 
     // vTaskDelay(5000 / portTICK_PERIOD_MS);
 
@@ -379,14 +381,16 @@ void app_main(void)
 
     while (1)
     {
-        if (mqttflag)
+        if (mqttflag && mqttflag2)
         {
+            mqttflag2 = 0;
             mqttflag = 0;
             mqtt_app_start();
         }
 
         if (timeflag)
         {
+            // timeflag = 0;
             get_time();
         }
 
