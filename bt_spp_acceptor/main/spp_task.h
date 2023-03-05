@@ -39,12 +39,6 @@ typedef struct
     void *param;      /*!< parameter area needs to be last */
 } spp_task_msg_t;
 
-typedef struct
-{
-    uint8_t funCode;
-    uint8_t *buff;
-} spp_queue_data_t;
-
 // /**
 //  * @brief     parameter deep-copy function to be customized
 //  */

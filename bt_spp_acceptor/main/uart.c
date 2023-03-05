@@ -44,7 +44,7 @@ void uart_init(void)
     uart_param_config(UART_NUM_2, &uart_config);
     uart_set_pin(UART_NUM_2, TXD_PIN, RXD_PIN, UART_PIN_NO_CHANGE, UART_PIN_NO_CHANGE);
 
-    spp_receive_queue = xQueueCreate(50 ,sizeof(spp_queue_data_t));
+    spp_receive_queue = xQueueCreate(50 ,sizeof(uint8_t));
 }
 
 int sendData(const char *logName, const char *data, uint8_t len)

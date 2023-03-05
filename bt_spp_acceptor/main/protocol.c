@@ -85,7 +85,6 @@ void Protocol_Send(uint8_t funCode, uint8_t *data)
 void Protocol_Receive(uint8_t *data)
 {
     uint8_t temp_sum = 0;
-    spp_queue_data_t tx_data;
 
     temp_sum = (data[0] + data[1] + data[2]);
 
@@ -122,12 +121,12 @@ void Protocol_Receive(uint8_t *data)
 
 void protocol_task(void *arg)
 {
-    spp_queue_data_t rec_data;
+    uint8_t spp_rcv_data;
 
     while (1)
     {
-        if (pdTRUE == xQueueReceive(spp_receive_queue, &rec_data, 200 / portTICK_PERIOD_MS))
-            frameA1.dat.remoteControl = *(rec_data.buff);
+        if (pdTRUE == xQueueReceive(spp_receive_queue, &spp_rcv_data, 200 / portTICK_PERIOD_MS))
+            frameA1.dat.remoteControl = spp_rcv_data;
         else
             frameA1.dat.remoteControl = 0;
         // xSemaphoreTake(protocol_semaphore, portMAX_DELAY);

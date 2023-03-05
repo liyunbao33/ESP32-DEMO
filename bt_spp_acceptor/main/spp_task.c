@@ -62,7 +62,6 @@ bool spp_task_work_dispatch(spp_task_cb_t p_cback, uint16_t event, void *p_param
 
 void spp_task_wr_cb(uint16_t event, esp_spp_cb_param_t *param)
 {
-    spp_queue_data_t spp_rec_data;
 
     switch (event) {
         case ESP_SPP_DATA_IND_EVT:    
@@ -70,9 +69,7 @@ void spp_task_wr_cb(uint16_t event, esp_spp_cb_param_t *param)
                 param->data_ind.len, param->data_ind.handle);
         if (param->data_ind.len < 128) {
             esp_log_buffer_hex("", param->data_ind.data, param->data_ind.len);
-            spp_rec_data.funCode = 0xA1;
-            spp_rec_data.buff = param->data_ind.data;
-            xQueueSend(spp_receive_queue, &spp_rec_data, 10 / portTICK_RATE_MS);
+            xQueueSend(spp_receive_queue, param->data_ind.data, 10 / portTICK_RATE_MS);
         }
         // printf("     esp_get_free_heap_size : %d  \n", esp_get_free_heap_size());
         break;
