@@ -301,11 +301,11 @@ void app_main(void)
         return;
     }
 
-    if ((ret = esp_spp_init(esp_spp_mode)) != ESP_OK)
-    {
-        ESP_LOGE(SPP_TAG, "%s spp init failed: %s\n", __func__, esp_err_to_name(ret));
-        return;
-    }
+    // if ((ret = esp_spp_init(esp_spp_mode)) != ESP_OK)
+    // {
+    //     ESP_LOGE(SPP_TAG, "%s spp init failed: %s\n", __func__, esp_err_to_name(ret));
+    //     return;
+    // }
 
 #if (CONFIG_BT_SSP_ENABLED == true)
     /* Set default parameters for Secure Simple Pairing */

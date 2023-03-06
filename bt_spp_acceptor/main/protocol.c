@@ -20,7 +20,6 @@
 #include "spp_task.h"
 #include "wifi.h"
 
-
 FrameA1_Union_TypeDef frameA1;
 FrameA2_Union_TypeDef frameA2;
 SemaphoreHandle_t protocol_semaphore;
@@ -107,7 +106,7 @@ void Protocol_Receive(uint8_t *data)
             {
                 frameA2.Data[i] = data[3 + i];
             }
-            // __ValueMonitor(frameA2.dat.internetSelect, xSemaphoreGive(protocol_semaphore));
+            __ValueMonitor(frameA2.dat.internetSelect, xSemaphoreGive(protocol_semaphore));
             // tx_data.funCode = 0xA2;
             // tx_data.buff = &frameA2.data.internetSelect;
             // xQueueSend(spp_receive_queue, &tx_data, 10 / portTICK_RATE_MS);
@@ -125,28 +124,30 @@ void protocol_task(void *arg)
 
     while (1)
     {
-        if (pdTRUE == xQueueReceive(spp_receive_queue, &spp_rcv_data, 200 / portTICK_PERIOD_MS))
+        if (pdTRUE == xQueueReceive(spp_receive_queue, &spp_rcv_data, 100 / portTICK_PERIOD_MS))
             frameA1.dat.remoteControl = spp_rcv_data;
         else
             frameA1.dat.remoteControl = 0;
-        // xSemaphoreTake(protocol_semaphore, portMAX_DELAY);
-        // switch (frameA2.data.internetSelect)
-        // {
-        // case BLUETOOH:
-        //     bt_spp_on();
-        //     mqtt_app_stop();
-        //     printf("bt_spp_on\n");
-        //     break;
-        // case WIFI:
-        //     bt_spp_off();
-        //     mqtt_app_start();
-        //     printf("mqtt_app_start\n");
-        //     break;
-        // default:
-        //     bt_spp_off();
-        //     mqtt_app_stop();
-        //     printf("bt_spp_off,mqtt_app_stop\n");
-        //     break;
-        // }
+        if (pdTRUE == xSemaphoreTake(protocol_semaphore, 10 / portTICK_PERIOD_MS))
+        {
+            switch (frameA2.dat.internetSelect)
+            {
+            case BLUETOOH:
+                bt_spp_on();
+                mqtt_app_stop();
+                printf("bt_spp_on\n");
+                break;
+            case WIFI:
+                bt_spp_off();
+                mqtt_app_start();
+                printf("mqtt_app_start\n");
+                break;
+            default:
+                bt_spp_off();
+                mqtt_app_stop();
+                printf("bt_spp_off,mqtt_app_stop\n");
+                break;
+            }
+        }
     }
 }
