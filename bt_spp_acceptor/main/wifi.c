@@ -34,11 +34,12 @@
 #include "lwip/dns.h"
 #include "lwip/netdb.h"
 #include "mqtt_client.h"
+#include "protocol.h"
 
 static const char *TAG = "example";
-static volatile uint8_t timeflag = 0;
-static volatile uint8_t mqttflag = 0;
-static volatile uint8_t mqttflag2 = 1;
+// static volatile uint8_t timeflag = 0;
+// static volatile uint8_t mqttflag = 0;
+// static volatile uint8_t mqttflag2 = 1;
 SemaphoreHandle_t sntpSemaphore;
 esp_mqtt_client_handle_t mqitt_client;
 void sntp_time_get_task(void);
@@ -267,7 +268,7 @@ static void smartconfig_example_task(void *parm)
         {
             ESP_LOGI(TAG, "WiFi Connected to ap");
             // get_time();
-            timeflag = 1;
+            // timeflag = 1;
             // mqttflag = 1;
         }
         if (uxBits & ESPTOUCH_DONE_BIT)
@@ -275,6 +276,7 @@ static void smartconfig_example_task(void *parm)
             ESP_LOGI(TAG, "smartconfig over");
             esp_smartconfig_stop();
             xSemaphoreGive(sntpSemaphore);
+            frameA1.dat.wifiStat = 1;
             vTaskDelete(NULL);
         }
     }

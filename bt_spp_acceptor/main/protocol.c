@@ -107,7 +107,7 @@ void Protocol_Receive(uint8_t *data)
             {
                 frameA2.Data[i] = data[3 + i];
             }
-            __ValueMonitor(frameA2.dat.internetSelect, xSemaphoreGive(protocol_semaphore));
+            // __ValueMonitor(frameA2.dat.internetSelect, xSemaphoreGive(protocol_semaphore));
             // tx_data.funCode = 0xA2;
             // tx_data.buff = &frameA2.data.internetSelect;
             // xQueueSend(spp_receive_queue, &tx_data, 10 / portTICK_RATE_MS);

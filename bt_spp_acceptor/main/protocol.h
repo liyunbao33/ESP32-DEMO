@@ -23,6 +23,7 @@
 typedef struct
 {
     unsigned char remoteControl;
+    unsigned char wifiStat;
 } FrameA1_Struct_TypeDef;
 
 typedef union

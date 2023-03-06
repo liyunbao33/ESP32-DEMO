@@ -343,7 +343,7 @@ void app_main(void)
 
     // printf(dict_getItem(*dict, "b"));
 
-    bt_spp_on();
+    // bt_spp_on();
 
     Protocol_Init();
     pow_init();
