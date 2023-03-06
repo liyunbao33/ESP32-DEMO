@@ -351,7 +351,7 @@ void app_main(void)
     // Allow other core to finish initialization
     vTaskDelay(pdMS_TO_TICKS(100));
     sntp_time_int();
-    initialise_wifi();
+    // initialise_wifi();
 
     // uint8_t data[] = {"{A1:2:3:4}$"};
     // while(1)

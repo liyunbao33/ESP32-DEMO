@@ -35,6 +35,8 @@
 #include "lwip/netdb.h"
 #include "mqtt_client.h"
 #include "protocol.h"
+#include "wifi.h"
+#include "main.h"
 
 static const char *TAG = "example";
 // static volatile uint8_t timeflag = 0;
@@ -112,6 +114,8 @@ static void mqtt_event_handler(void *handler_args, esp_event_base_t base, int32_
 
 void mqtt_app_start(void)
 {
+    __ExecuteOnce(initialise_wifi());
+
     esp_mqtt_client_config_t mqtt_cfg = {
         .uri = "mqtt://mqtt.eclipseprojects.io",
     };
@@ -152,8 +156,8 @@ void mqtt_app_stop(void)
         esp_mqtt_client_stop(mqitt_client);
         // esp_mqtt_client_unregister_event(mqitt_client, ESP_EVENT_ANY_ID, mqtt_event_handler);
         esp_mqtt_client_destroy(mqitt_client);
+        mqitt_client = NULL;
     }
-    mqitt_client = NULL;
 }
 
 /* smart config */
