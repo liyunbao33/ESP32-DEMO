@@ -32,6 +32,7 @@ typedef struct
     unsigned char yearH;
     unsigned char yearL;
     unsigned char updateTimeFlag;
+    unsigned char mqttFlag;
 } FrameA1_Struct_TypeDef;
 
 typedef union

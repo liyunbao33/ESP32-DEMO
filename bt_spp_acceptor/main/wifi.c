@@ -37,6 +37,7 @@
 #include "protocol.h"
 #include "wifi.h"
 #include "main.h"
+#include <stdlib.h>
 
 static const char *TAG = "example";
 // static volatile uint8_t timeflag = 0;
@@ -88,6 +89,7 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
         ESP_LOGI(TAG, "MQTT_EVENT_DATA");
         printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
         printf("DATA=%.*s\r\n", event->data_len, event->data);
+        frameA1.dat.mqttFlag = atoi(event->data);
         break;
     case MQTT_EVENT_ERROR:
         ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
