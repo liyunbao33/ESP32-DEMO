@@ -24,6 +24,14 @@ typedef struct
 {
     unsigned char remoteControl;
     unsigned char wifiStat;
+    unsigned char sec;
+    unsigned char min;
+    unsigned char hour;
+    unsigned char day;
+    unsigned char mon;
+    unsigned char yearH;
+    unsigned char yearL;
+    unsigned char updateTimeFlag;
 } FrameA1_Struct_TypeDef;
 
 typedef union

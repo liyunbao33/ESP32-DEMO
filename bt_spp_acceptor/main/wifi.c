@@ -367,6 +367,15 @@ void sntp_time_get_task(void)
         localtime_r(&now, &timeinfo);
         strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
         ESP_LOGI(TAG, "The current date/time in Shanghai is: %s", strftime_buf);
+        frameA1.dat.sec = timeinfo.tm_sec;
+        frameA1.dat.min = timeinfo.tm_min;
+        frameA1.dat.hour = timeinfo.tm_hour;
+        frameA1.dat.day = timeinfo.tm_mday;
+        frameA1.dat.mon = timeinfo.tm_mon;
+        frameA1.dat.yearL = ((timeinfo.tm_year+1900)&0xFF);
+        frameA1.dat.yearH = ((timeinfo.tm_year+1900)>>8);
+        frameA1.dat.updateTimeFlag = 1;
+
         // mqttflag = 1;
 
         // vTaskDelay(5000 / portTICK_PERIOD_MS);
