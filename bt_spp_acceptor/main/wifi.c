@@ -37,12 +37,8 @@
 #include "protocol.h"
 #include "wifi.h"
 #include "main.h"
-#include <stdlib.h>
 
 static const char *TAG = "example";
-// static volatile uint8_t timeflag = 0;
-// static volatile uint8_t mqttflag = 0;
-// static volatile uint8_t mqttflag2 = 1;
 SemaphoreHandle_t sntpSemaphore;
 esp_mqtt_client_handle_t mqitt_client;
 void sntp_time_get_task(void);
@@ -89,7 +85,10 @@ static esp_err_t mqtt_event_handler_cb(esp_mqtt_event_handle_t event)
         ESP_LOGI(TAG, "MQTT_EVENT_DATA");
         printf("TOPIC=%.*s\r\n", event->topic_len, event->topic);
         printf("DATA=%.*s\r\n", event->data_len, event->data);
-        frameA1.dat.mqttFlag = atoi(event->data);
+        if (!memcmp(event->data, "turn on light", strlen("turn on light")))
+            frameA1.dat.mqttFlag = 1;
+        else if (!memcmp(event->data, "turn off light", strlen("turn off light")))
+            frameA1.dat.mqttFlag = 0;
         break;
     case MQTT_EVENT_ERROR:
         ESP_LOGI(TAG, "MQTT_EVENT_ERROR");
@@ -273,9 +272,6 @@ static void smartconfig_example_task(void *parm)
         if (uxBits & CONNECTED_BIT)
         {
             ESP_LOGI(TAG, "WiFi Connected to ap");
-            // get_time();
-            // timeflag = 1;
-            // mqttflag = 1;
         }
         if (uxBits & ESPTOUCH_DONE_BIT)
         {
@@ -378,8 +374,8 @@ void sntp_time_get_task(void)
         frameA1.dat.hour = timeinfo.tm_hour;
         frameA1.dat.day = timeinfo.tm_mday;
         frameA1.dat.mon = timeinfo.tm_mon;
-        frameA1.dat.yearL = ((timeinfo.tm_year+1900)&0xFF);
-        frameA1.dat.yearH = ((timeinfo.tm_year+1900)>>8);
+        frameA1.dat.yearL = ((timeinfo.tm_year + 1900) & 0xFF);
+        frameA1.dat.yearH = ((timeinfo.tm_year + 1900) >> 8);
         frameA1.dat.updateTimeFlag = 1;
 
         // mqttflag = 1;
@@ -422,12 +418,7 @@ void sntp_time_get_task(void)
 
 //     while (1)
 //     {
-//         if (mqttflag && mqttflag2)
-//         {
-//             mqttflag2 = 0;
-//             mqttflag = 0;
-//             mqtt_app_start();
-//         }
+//
 
 //         if (timeflag)
 //         {
