@@ -34,32 +34,26 @@ endif()
 
 # Set default install directory permissions.
 if(NOT DEFINED CMAKE_OBJDUMP)
-  set(CMAKE_OBJDUMP "D:/APP/ESP32/.espressif/tools/xtensa-esp32-elf/esp-2021r2-patch3-8.4.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-objdump.exe")
+  set(CMAKE_OBJDUMP "D:/APP/ESP32/Espressif/tools/xtensa-esp32-elf/esp-2022r1-11.2.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-objdump.exe")
 endif()
 
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include/mbedtls" TYPE FILE PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ FILES
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/aes.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/aesni.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/arc4.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/aria.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/asn1.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/asn1write.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/base64.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/bignum.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/blowfish.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/bn_mul.h"
+    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/build_info.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/camellia.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ccm.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/certs.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/chacha20.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/chachapoly.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/check_config.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/cipher.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/cipher_internal.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/cmac.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/compat-1.3.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/config.h"
+    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/compat-2.x.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/config_psa.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/constant_time.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ctr_drbg.h"
@@ -70,39 +64,30 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ecdsa.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ecjpake.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ecp.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ecp_internal.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/entropy.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/entropy_poll.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/error.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/gcm.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/havege.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/hkdf.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/hmac_drbg.h"
+    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/mbedtls_config.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/md.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/md2.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/md4.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/md5.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/md_internal.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/memory_buffer_alloc.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/net.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/net_sockets.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/nist_kw.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/oid.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/padlock.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/pem.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/pk.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/pk_internal.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/pkcs11.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/pkcs12.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/pkcs5.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/platform.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/platform_time.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/platform_util.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/poly1305.h"
+    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/private_access.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/psa_util.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ripemd160.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/rsa.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/rsa_internal.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/sha1.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/sha256.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/sha512.h"
@@ -110,7 +95,6 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ssl_cache.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ssl_ciphersuites.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ssl_cookie.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ssl_internal.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/ssl_ticket.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/threading.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/timing.h"
@@ -119,11 +103,10 @@ if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/x509_crl.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/x509_crt.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/x509_csr.h"
-    "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/mbedtls/xtea.h"
     )
 endif()
 
-if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+if(CMAKE_INSTALL_COMPONENT STREQUAL "Unspecified" OR NOT CMAKE_INSTALL_COMPONENT)
   file(INSTALL DESTINATION "${CMAKE_INSTALL_PREFIX}/include/psa" TYPE FILE PERMISSIONS OWNER_READ OWNER_WRITE GROUP_READ WORLD_READ FILES
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/psa/crypto.h"
     "D:/APP/ESP32/esp/esp-idf/components/mbedtls/mbedtls/include/psa/crypto_builtin_composites.h"

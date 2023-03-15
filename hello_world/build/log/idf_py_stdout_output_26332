@@ -1,0 +1,44 @@
+-- Found Git: D:/APP/ESP32/Espressif/tools/idf-git/2.30.1/cmd/git.exe  
+-- The C compiler identification is GNU 11.2.0
+-- The CXX compiler identification is GNU 11.2.0
+-- The ASM compiler identification is GNU
+-- Found assembler: D:/APP/ESP32/Espressif/tools/xtensa-esp32-elf/esp-2022r1-11.2.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc.exe
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Check for working C compiler: D:/APP/ESP32/Espressif/tools/xtensa-esp32-elf/esp-2022r1-11.2.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-gcc.exe - skipped
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Check for working CXX compiler: D:/APP/ESP32/Espressif/tools/xtensa-esp32-elf/esp-2022r1-11.2.0/xtensa-esp32-elf/bin/xtensa-esp32-elf-g++.exe - skipped
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Project is not inside a git repository, or git repository has no commits; will not use 'git describe' to determine PROJECT_VER.
+-- Building ESP-IDF components for target esp32
+-- Project sdkconfig file D:/MyProject/ESP32-DEMO/hello_world/sdkconfig
+-- Looking for sys/types.h
+-- Looking for sys/types.h - found
+-- Looking for stdint.h
+-- Looking for stdint.h - found
+-- Looking for stddef.h
+-- Looking for stddef.h - found
+-- Check size of time_t
+-- Check size of time_t - done
+-- Found Python3: D:/APP/ESP32/Espressif/python_env/idf5.0_py3.8_env/Scripts/python.exe (found version "3.8.7") found components: Interpreter 
+-- Performing Test C_COMPILER_SUPPORTS_WFORMAT_SIGNEDNESS
+-- Performing Test C_COMPILER_SUPPORTS_WFORMAT_SIGNEDNESS - Success
+-- App "hello_world" version: 1
+-- Adding linker script D:/MyProject/ESP32-DEMO/hello_world/build/esp-idf/esp_system/ld/memory.ld
+-- Adding linker script D:/APP/ESP32/esp/esp-idf/components/esp_system/ld/esp32/sections.ld.in
+-- Adding linker script D:/APP/ESP32/esp/esp-idf/components/esp_rom/esp32/ld/esp32.rom.ld
+-- Adding linker script D:/APP/ESP32/esp/esp-idf/components/esp_rom/esp32/ld/esp32.rom.api.ld
+-- Adding linker script D:/APP/ESP32/esp/esp-idf/components/esp_rom/esp32/ld/esp32.rom.libgcc.ld
+-- Adding linker script D:/APP/ESP32/esp/esp-idf/components/esp_rom/esp32/ld/esp32.rom.newlib-data.ld
+-- Adding linker script D:/APP/ESP32/esp/esp-idf/components/esp_rom/esp32/ld/esp32.rom.syscalls.ld
+-- Adding linker script D:/APP/ESP32/esp/esp-idf/components/esp_rom/esp32/ld/esp32.rom.newlib-funcs.ld
+-- Adding linker script D:/APP/ESP32/esp/esp-idf/components/soc/esp32/ld/esp32.peripherals.ld
+-- Components: app_trace app_update bootloader bootloader_support bt cmock console cxx driver efuse esp-tls esp_adc esp_app_format esp_common esp_eth esp_event esp_gdbstub esp_hid esp_http_client esp_http_server esp_https_ota esp_https_server esp_hw_support esp_lcd esp_local_ctrl esp_netif esp_partition esp_phy esp_pm esp_psram esp_ringbuf esp_rom esp_system esp_timer esp_wifi espcoredump esptool_py fatfs freertos hal heap http_parser idf_test ieee802154 json log lwip main mbedtls mqtt newlib nvs_flash openthread partition_table perfmon protobuf-c protocomm pthread sdmmc soc spi_flash spiffs tcp_transport ulp unity usb vfs wear_levelling wifi_provisioning wpa_supplicant xtensa
+-- Component paths: D:/APP/ESP32/esp/esp-idf/components/app_trace D:/APP/ESP32/esp/esp-idf/components/app_update D:/APP/ESP32/esp/esp-idf/components/bootloader D:/APP/ESP32/esp/esp-idf/components/bootloader_support D:/APP/ESP32/esp/esp-idf/components/bt D:/APP/ESP32/esp/esp-idf/components/cmock D:/APP/ESP32/esp/esp-idf/components/console D:/APP/ESP32/esp/esp-idf/components/cxx D:/APP/ESP32/esp/esp-idf/components/driver D:/APP/ESP32/esp/esp-idf/components/efuse D:/APP/ESP32/esp/esp-idf/components/esp-tls D:/APP/ESP32/esp/esp-idf/components/esp_adc D:/APP/ESP32/esp/esp-idf/components/esp_app_format D:/APP/ESP32/esp/esp-idf/components/esp_common D:/APP/ESP32/esp/esp-idf/components/esp_eth D:/APP/ESP32/esp/esp-idf/components/esp_event D:/APP/ESP32/esp/esp-idf/components/esp_gdbstub D:/APP/ESP32/esp/esp-idf/components/esp_hid D:/APP/ESP32/esp/esp-idf/components/esp_http_client D:/APP/ESP32/esp/esp-idf/components/esp_http_server D:/APP/ESP32/esp/esp-idf/components/esp_https_ota D:/APP/ESP32/esp/esp-idf/components/esp_https_server D:/APP/ESP32/esp/esp-idf/components/esp_hw_support D:/APP/ESP32/esp/esp-idf/components/esp_lcd D:/APP/ESP32/esp/esp-idf/components/esp_local_ctrl D:/APP/ESP32/esp/esp-idf/components/esp_netif D:/APP/ESP32/esp/esp-idf/components/esp_partition D:/APP/ESP32/esp/esp-idf/components/esp_phy D:/APP/ESP32/esp/esp-idf/components/esp_pm D:/APP/ESP32/esp/esp-idf/components/esp_psram D:/APP/ESP32/esp/esp-idf/components/esp_ringbuf D:/APP/ESP32/esp/esp-idf/components/esp_rom D:/APP/ESP32/esp/esp-idf/components/esp_system D:/APP/ESP32/esp/esp-idf/components/esp_timer D:/APP/ESP32/esp/esp-idf/components/esp_wifi D:/APP/ESP32/esp/esp-idf/components/espcoredump D:/APP/ESP32/esp/esp-idf/components/esptool_py D:/APP/ESP32/esp/esp-idf/components/fatfs D:/APP/ESP32/esp/esp-idf/components/freertos D:/APP/ESP32/esp/esp-idf/components/hal D:/APP/ESP32/esp/esp-idf/components/heap D:/APP/ESP32/esp/esp-idf/components/http_parser D:/APP/ESP32/esp/esp-idf/components/idf_test D:/APP/ESP32/esp/esp-idf/components/ieee802154 D:/APP/ESP32/esp/esp-idf/components/json D:/APP/ESP32/esp/esp-idf/components/log D:/APP/ESP32/esp/esp-idf/components/lwip D:/MyProject/ESP32-DEMO/hello_world/main D:/APP/ESP32/esp/esp-idf/components/mbedtls D:/APP/ESP32/esp/esp-idf/components/mqtt D:/APP/ESP32/esp/esp-idf/components/newlib D:/APP/ESP32/esp/esp-idf/components/nvs_flash D:/APP/ESP32/esp/esp-idf/components/openthread D:/APP/ESP32/esp/esp-idf/components/partition_table D:/APP/ESP32/esp/esp-idf/components/perfmon D:/APP/ESP32/esp/esp-idf/components/protobuf-c D:/APP/ESP32/esp/esp-idf/components/protocomm D:/APP/ESP32/esp/esp-idf/components/pthread D:/APP/ESP32/esp/esp-idf/components/sdmmc D:/APP/ESP32/esp/esp-idf/components/soc D:/APP/ESP32/esp/esp-idf/components/spi_flash D:/APP/ESP32/esp/esp-idf/components/spiffs D:/APP/ESP32/esp/esp-idf/components/tcp_transport D:/APP/ESP32/esp/esp-idf/components/ulp D:/APP/ESP32/esp/esp-idf/components/unity D:/APP/ESP32/esp/esp-idf/components/usb D:/APP/ESP32/esp/esp-idf/components/vfs D:/APP/ESP32/esp/esp-idf/components/wear_levelling D:/APP/ESP32/esp/esp-idf/components/wifi_provisioning D:/APP/ESP32/esp/esp-idf/components/wpa_supplicant D:/APP/ESP32/esp/esp-idf/components/xtensa
+-- Configuring done
+-- Generating done
+-- Build files have been written to: D:/MyProject/ESP32-DEMO/hello_world/build

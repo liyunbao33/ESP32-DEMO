@@ -54,3 +54,6 @@ sntp/.vscode
 
 tcp/build
 tcp/.vscode
+
+lcd/build
+lcd/.vscode
