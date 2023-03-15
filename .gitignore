@@ -57,3 +57,6 @@ tcp/.vscode
 
 lcd/build
 lcd/.vscode
+
+led_strip/build
+led_strip/.vscode
