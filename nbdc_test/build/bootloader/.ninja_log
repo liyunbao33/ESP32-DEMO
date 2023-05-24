@@ -103,3 +103,7 @@
 24464	27345	7065582930088735	D:/MyProject/ESP32-DEMO/nbdc_test/build/bootloader/.bin_timestamp	1de4df0d6d660f27
 27432	28691	0	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	53e050cb258b766a
 27432	28691	0	D:/MyProject/ESP32-DEMO/nbdc_test/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	53e050cb258b766a
+26	244	0	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	53e050cb258b766a
+26	244	0	D:/MyProject/ESP32-DEMO/nbdc_test/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	53e050cb258b766a
+25	219	0	esp-idf/esptool_py/CMakeFiles/bootloader_check_size	53e050cb258b766a
+25	219	0	D:/MyProject/ESP32-DEMO/nbdc_test/build/bootloader/esp-idf/esptool_py/CMakeFiles/bootloader_check_size	53e050cb258b766a

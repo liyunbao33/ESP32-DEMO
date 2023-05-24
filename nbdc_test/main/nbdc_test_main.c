@@ -9,22 +9,11 @@
 #include "esp_log.h"
 #include "driver/mcpwm_prelude.h"
 
-static const char *TAG = "example";
+static const char *TAG = "nbdc";
 
-// Please consult the datasheet of your servo before changing the following parameters
-#define SERVO_MIN_PULSEWIDTH_US 500  // Minimum pulse width in microsecond
-#define SERVO_MAX_PULSEWIDTH_US 2500  // Maximum pulse width in microsecond
-#define SERVO_MIN_DEGREE        -90   // Minimum angle
-#define SERVO_MAX_DEGREE        90    // Maximum angle
-
-#define SERVO_PULSE_GPIO             0        // GPIO connects to the PWM signal line
-#define SERVO_TIMEBASE_RESOLUTION_HZ 1000000  // 1MHz, 1us per tick
-#define SERVO_TIMEBASE_PERIOD        50    // 20000 ticks, 20ms
-
-static inline uint32_t example_angle_to_compare(int angle)
-{
-    return (angle - SERVO_MIN_DEGREE) * (SERVO_MAX_PULSEWIDTH_US - SERVO_MIN_PULSEWIDTH_US) / (SERVO_MAX_DEGREE - SERVO_MIN_DEGREE) + SERVO_MIN_PULSEWIDTH_US;
-}
+#define PULSE_GPIO             0        // GPIO connects to the PWM signal line
+#define TIMEBASE_RESOLUTION_HZ 1000000  // 1MHz, 1us per tick
+#define TIMEBASE_PERIOD        100    // 20000 ticks, 20ms
 
 void app_main(void)
 {
@@ -33,8 +22,8 @@ void app_main(void)
     mcpwm_timer_config_t timer_config = {
         .group_id = 0,
         .clk_src = MCPWM_TIMER_CLK_SRC_DEFAULT,
-        .resolution_hz = SERVO_TIMEBASE_RESOLUTION_HZ,
-        .period_ticks = SERVO_TIMEBASE_PERIOD,
+        .resolution_hz = TIMEBASE_RESOLUTION_HZ,
+        .period_ticks = TIMEBASE_PERIOD,
         .count_mode = MCPWM_TIMER_COUNT_MODE_UP,
     };
     ESP_ERROR_CHECK(mcpwm_new_timer(&timer_config, &timer));
@@ -57,12 +46,9 @@ void app_main(void)
 
     mcpwm_gen_handle_t generator = NULL;
     mcpwm_generator_config_t generator_config = {
-        .gen_gpio_num = SERVO_PULSE_GPIO,
+        .gen_gpio_num = PULSE_GPIO,
     };
     ESP_ERROR_CHECK(mcpwm_new_generator(oper, &generator_config, &generator));
-
-    // set the initial compare value, so that the servo will spin to the center position
-    // ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(comparator, example_angle_to_compare(0)));
 
     ESP_LOGI(TAG, "Set generator action on timer and compare event");
     // go high on counter empty
@@ -78,15 +64,16 @@ void app_main(void)
     ESP_ERROR_CHECK(mcpwm_timer_enable(timer));
     ESP_ERROR_CHECK(mcpwm_timer_start_stop(timer, MCPWM_TIMER_START_NO_STOP));
 
-    int angle = 0;
     int step = 0;
+    int step_done = 0;
     while (1) {
-        ESP_LOGI(TAG, "Angle of rotation: %d", angle);
+        step_done = 100 - step;
+        ESP_LOGI(TAG, "Angle of rotation: %d", step_done);
         ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(comparator, step));
         //Add delay, since it takes time for servo to rotate, usually 200ms/60degree rotation under 5V power supply
         vTaskDelay(pdMS_TO_TICKS(5000));
-        if (step > 50)
+        if (step > 100)
             step = 0;
-        step += 10;
+        step += 20;
     }   
 }
