@@ -27,6 +27,23 @@ static const char *TAG = "example";
 //     return (high_task_wakeup == pdTRUE);
 // }
 
+pcnt_unit_handle_t pcnt_unit = NULL;
+
+static void get_count_task(void *arg)
+{
+    int pulse_count = 0;
+    // int event_count = 0;
+    while (1) {
+        vTaskDelay(10);
+        // if (xQueueReceive(queue, &event_count, pdMS_TO_TICKS(1000))) {
+        //     ESP_LOGI(TAG, "Watch point event, count: %d", event_count);
+        // } else {
+            ESP_ERROR_CHECK(pcnt_unit_get_count(pcnt_unit, &pulse_count));
+            ESP_LOGI(TAG, "Pulse count: %d", pulse_count);
+        // }
+    }
+}
+
 void app_main(void)
 {
     ESP_LOGI(TAG, "install pcnt unit");
@@ -34,7 +51,6 @@ void app_main(void)
         .high_limit = EXAMPLE_PCNT_HIGH_LIMIT,
         .low_limit = EXAMPLE_PCNT_LOW_LIMIT,
     };
-    pcnt_unit_handle_t pcnt_unit = NULL;
     ESP_ERROR_CHECK(pcnt_new_unit(&unit_config, &pcnt_unit));
 
     ESP_LOGI(TAG, "set glitch filter");
@@ -81,16 +97,5 @@ void app_main(void)
     ESP_LOGI(TAG, "start pcnt unit");
     ESP_ERROR_CHECK(pcnt_unit_start(pcnt_unit));
 
-    // Report counter value
-    int pulse_count = 0;
-    // int event_count = 0;
-    while (1) {
-        vTaskDelay(10);
-        // if (xQueueReceive(queue, &event_count, pdMS_TO_TICKS(1000))) {
-        //     ESP_LOGI(TAG, "Watch point event, count: %d", event_count);
-        // } else {
-            ESP_ERROR_CHECK(pcnt_unit_get_count(pcnt_unit, &pulse_count));
-            ESP_LOGI(TAG, "Pulse count: %d", pulse_count);
-        // }
-    }
+    xTaskCreate(get_count_task, "get_count_task", 1024*2, NULL, configMAX_PRIORITIES, NULL);
 }
