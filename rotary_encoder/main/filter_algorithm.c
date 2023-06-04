@@ -84,14 +84,14 @@ int32_t Arith_AverageFiter(int32_t value)
 
     if(filter_cnt < ARR_NUM)  
     {
-        filter_cnt++;
         arr[filter_cnt] = value;
+        filter_cnt++;
     }
     else
     {
         filter_cnt = 0;
         bubble_sort(arr, ARR_NUM);
-        for(uint8_t i = 1; i < ARR_NUM - 2; i++)
+        for(uint8_t i = 1; i < ARR_NUM - 1; i++)
         {
             filter_value += arr[i];
         }
