@@ -6,17 +6,16 @@
 #define TWO_SEC (2000/10) /* unit of ms */
 #define BSP_KEY_GPIO	0
 
-static uint8_t IsKeyUpPress(void)
+static uint8_t IsBSPKeyPress(void)
 {
-	// return (!(PAin(8)))?true:false; 
-	return 0;
+	return gpio_get_level(BSP_KEY_GPIO);
 }
 
-static uint8_t IsKeyDownPress(void)
-{
-	// return (!(PAin(8)))?true:false; 
-	return 0;
-}
+// static uint8_t IsKeyDownPress(void)
+// {
+// 	// return (!(PAin(8)))?true:false; 
+// 	return 0;
+// }
 
 typedef struct
 {
@@ -32,8 +31,8 @@ typedef struct
 
 KEY_TypeDef key[] = 
 {
-	{IsKeyUpPress, 3, 0, 50, 0, UP, 20, 0},
-	{IsKeyDownPress, 3, 0, 100, 80, UP, 0, 0},
+	{IsBSPKeyPress, 3, 0, 50, 0, UP, 0, 0},
+	// {IsKeyDownPress, 3, 0, 100, 80, UP, 0, 0},
 
 };
 KEY_ValueTypeDef key_value = KEY_NONE;
@@ -57,10 +56,10 @@ void KEY_Init(void) {
 	// KEY_GPIO_Struct.Pin = GPIO_PIN_1|GPIO_PIN_2|GPIO_PIN_3;  
 	// HAL_GPIO_Init(GPIOC,&KEY_GPIO_Struct);
 
-	// gpio_reset_pin(KYE_GPIO);
-    // /* Set the GPIO as a push/pull output */
-    // gpio_set_direction(KYE_GPIO, GPIO_MODE_INPUT);
-    // gpio_set_pull_mode(KYE_GPIO, GPIO_PULLUP_ONLY);
+	gpio_reset_pin(BSP_KEY_GPIO);
+    /* Set the GPIO as a push/pull output */
+    gpio_set_direction(BSP_KEY_GPIO, GPIO_MODE_INPUT);
+    gpio_set_pull_mode(BSP_KEY_GPIO, GPIO_PULLUP_ONLY);
 
 }
 

@@ -11,6 +11,7 @@
 #include "driver/pulse_cnt.h"
 #include "filter_algorithm.h"
 #include "driver/mcpwm_prelude.h"
+#include "key.h"
 
 static const char *TAG = "example";
 
@@ -72,6 +73,18 @@ static void set_motor_pwm_task(void *arg)
         if (step > 100)
             step = 0;
         step += 20;
+    }   
+}
+
+static void key_scan_task(void *arg)
+{
+     while (1) {
+        vTaskDelay(pdMS_TO_TICKS(10));
+        KEY_Scan();
+        // if(KEY_Query(BSP_KEY_PRESS))
+        // {
+        //     ESP_LOGI(TAG, "key is ok");
+        // }
     }   
 }
 
@@ -180,8 +193,10 @@ static void MCPWM_Init(void)
 
 void app_main(void)
 {
+    KEY_Init();
     MCPWM_Init();
     PCNT_Init();
     xTaskCreate(get_count_task, "get_count_task", 1024*2, NULL, configMAX_PRIORITIES-1, NULL);
     xTaskCreate(set_motor_pwm_task, "set_motor_pwm_task", 1024*2, NULL, configMAX_PRIORITIES, NULL);
+    xTaskCreate(key_scan_task, "key_scan_task", 1024*2, NULL, configMAX_PRIORITIES, NULL);
 }
