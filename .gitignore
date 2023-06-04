@@ -63,3 +63,6 @@ led_strip/.vscode
 
 mcpwm_bdc_speed_control/build
 mcpwm_bdc_speed_control/.vscode
+
+rotary_encoder/build
+rotary_encoder/.vscode
