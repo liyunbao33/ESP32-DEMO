@@ -20,7 +20,7 @@ static const char *TAG = "example";
 #define EXAMPLE_EC11_GPIO_A 16
 #define EXAMPLE_EC11_GPIO_B 4
 
-#define PULSE_GPIO             0        // GPIO connects to the PWM signal line
+#define PULSE_GPIO             2        // GPIO connects to the PWM signal line
 #define TIMEBASE_RESOLUTION_HZ 1000000  // 1MHz, 1us per tick
 #define TIMEBASE_PERIOD        100    // 20000 ticks, 20ms
 
