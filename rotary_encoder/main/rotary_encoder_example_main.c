@@ -56,7 +56,7 @@ static void get_count_task(void *arg)
     }
 }
 
-void app_main(void)
+static void PCNT_Init(void)
 {
     ESP_LOGI(TAG, "install pcnt unit");
     pcnt_unit_config_t unit_config = {
@@ -108,6 +108,15 @@ void app_main(void)
     ESP_ERROR_CHECK(pcnt_unit_clear_count(pcnt_unit));
     ESP_LOGI(TAG, "start pcnt unit");
     ESP_ERROR_CHECK(pcnt_unit_start(pcnt_unit));
+}
 
+static void MCPWM_Init(void)
+{
+
+}
+
+void app_main(void)
+{
+    PCNT_Init();
     xTaskCreate(get_count_task, "get_count_task", 1024*2, NULL, configMAX_PRIORITIES, NULL);
 }
