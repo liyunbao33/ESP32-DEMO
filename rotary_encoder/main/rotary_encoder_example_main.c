@@ -9,11 +9,12 @@
 #include "freertos/queue.h"
 #include "esp_log.h"
 #include "driver/pulse_cnt.h"
+#include "filter_algorithm.h"
 
 static const char *TAG = "example";
 
-#define EXAMPLE_PCNT_HIGH_LIMIT 100
-#define EXAMPLE_PCNT_LOW_LIMIT  -100
+#define EXAMPLE_PCNT_HIGH_LIMIT 1000
+#define EXAMPLE_PCNT_LOW_LIMIT  -1000
 
 #define EXAMPLE_EC11_GPIO_A 16
 #define EXAMPLE_EC11_GPIO_B 4
@@ -31,15 +32,26 @@ pcnt_unit_handle_t pcnt_unit = NULL;
 
 static void get_count_task(void *arg)
 {
-    int pulse_count = 0;
+    static int last_pulse_count = 0;
     // int event_count = 0;
     while (1) {
-        vTaskDelay(10);
+        vTaskDelay(pdMS_TO_TICKS(10));
+        // get the result from rotary encoder
+        int cur_pulse_count = 0;
+        int real_pulses = 0;
+        pcnt_unit_get_count(pcnt_unit, &cur_pulse_count);
+        real_pulses = cur_pulse_count - last_pulse_count;
+        last_pulse_count = cur_pulse_count;
+
+        real_pulses = (int)Arith_AverageFiter(real_pulses);
+
+        ESP_LOGI(TAG, "Pulse count: %d", real_pulses);
+        
         // if (xQueueReceive(queue, &event_count, pdMS_TO_TICKS(1000))) {
         //     ESP_LOGI(TAG, "Watch point event, count: %d", event_count);
         // } else {
-            ESP_ERROR_CHECK(pcnt_unit_get_count(pcnt_unit, &pulse_count));
-            ESP_LOGI(TAG, "Pulse count: %d", pulse_count);
+            // ESP_ERROR_CHECK(pcnt_unit_get_count(pcnt_unit, &pulse_count));
+            // ESP_LOGI(TAG, "Pulse count: %d", pulse_count);
         // }
     }
 }
