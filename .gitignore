@@ -66,3 +66,6 @@ mcpwm_bdc_speed_control/.vscode
 
 rotary_encoder/build
 rotary_encoder/.vscode
+
+twai_self_test/build
+twai_self_test/.vscode
