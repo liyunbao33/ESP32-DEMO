@@ -46,9 +46,6 @@ static void get_count_task(void *arg)
         real_pulses = (int)Arith_AverageFiter(real_pulses);
 
         ESP_LOGI(TAG, "Pulse count: %d", real_pulses);
-
-        // ESP_LOGI(TAG, "last_Pulse count: %d", last_pulse_count);
-        // ESP_LOGI(TAG, "cur_Pulse count: %d", cur_pulse_count);
         
         // if (xQueueReceive(queue, &event_count, pdMS_TO_TICKS(1000))) {
         //     ESP_LOGI(TAG, "Watch point event, count: %d", event_count);
