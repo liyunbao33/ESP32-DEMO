@@ -12,6 +12,7 @@
 #include "filter_algorithm.h"
 #include "driver/mcpwm_prelude.h"
 #include "key.h"
+#include "driver/gpio.h"
 
 static const char *TAG = "example";
 
@@ -24,6 +25,13 @@ static const char *TAG = "example";
 #define PULSE_GPIO             2        // GPIO connects to the PWM signal line
 #define TIMEBASE_RESOLUTION_HZ 1000000  // 1MHz, 1us per tick
 #define TIMEBASE_PERIOD        100    // 20000 ticks, 20ms
+
+#define DIR_GPIO 15
+
+#define __ToggleValue(value)\
+do{\
+    if((value)){(value)=false;}else{(value)=true;}\
+}while(0)
 
 // static bool example_pcnt_on_reach(pcnt_unit_handle_t unit, const pcnt_watch_event_data_t *edata, void *user_ctx)
 // {
@@ -65,26 +73,36 @@ static void get_count_task(void *arg)
 
 static void set_motor_pwm_task(void *arg)
 {
-    static int step = 0;
+    // static int step = 0;
     while (1) {
         vTaskDelay(pdMS_TO_TICKS(5000));
-        ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(comparator, step));
+        ESP_ERROR_CHECK(mcpwm_comparator_set_compare_value(comparator, 50));
         //Add delay, since it takes time for servo to rotate, usually 200ms/60degree rotation under 5V power supply
-        if (step > 100)
-            step = 0;
-        step += 20;
+        // if (step > 100)
+        //     step = 0;
+        // step += 20;
     }   
 }
 
 static void key_scan_task(void *arg)
 {
+    static bool phore = false; 
      while (1) {
         vTaskDelay(pdMS_TO_TICKS(10));
         KEY_Scan();
-        // if(KEY_Query(BSP_KEY_PRESS))
-        // {
-        //     ESP_LOGI(TAG, "key is ok");
-        // }
+
+        if(KEY_Query(BSP_KEY_PRESS))
+        {
+            __ToggleValue(phore);
+            if(phore)
+            {
+                gpio_set_level(DIR_GPIO, 1);
+            }
+            else
+            {
+                gpio_set_level(DIR_GPIO, 0);
+            }
+        }
     }   
 }
 
@@ -191,9 +209,17 @@ static void MCPWM_Init(void)
     ESP_ERROR_CHECK(mcpwm_timer_start_stop(timer, MCPWM_TIMER_START_NO_STOP));
 }
 
+static void Dir_Init(void)
+{
+    gpio_reset_pin(DIR_GPIO);
+    /* Set the GPIO as a push/pull output */
+    gpio_set_direction(DIR_GPIO, GPIO_MODE_OUTPUT);
+}
+
 void app_main(void)
 {
     KEY_Init();
+    Dir_Init();
     MCPWM_Init();
     PCNT_Init();
     xTaskCreate(get_count_task, "get_count_task", 1024*2, NULL, configMAX_PRIORITIES-1, NULL);
