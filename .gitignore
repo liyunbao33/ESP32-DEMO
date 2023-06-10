@@ -69,3 +69,6 @@ rotary_encoder/.vscode
 
 twai_self_test/build
 twai_self_test/.vscode
+
+mcpwm_bldc_hall_control/build
+mcpwm_bldc_hall_control/.vscode
